@@ -146,6 +146,17 @@
             margin-top: 5px;
             font-style: italic;
         }
+        .error-message {
+            background-color: #f44336;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -154,15 +165,17 @@
     <header>
         <h1>Add Your Recipe</h1>
     </header>
-
+    
     <div class="form-container">
+        <div id="errorMessage" class="error-message"></div>
+        
         <form id="recipeForm" action="#" method="post">
             <!-- Recipe Name -->
             <div class="form-group">
                 <label for="recipeName">Recipe Name <span class="required">*</span></label>
                 <input type="text" id="recipeName" name="recipeName" required placeholder="e.g., Chocolate Chip Cookies">
             </div>
-
+            
             <!-- Category -->
             <div class="form-group">
                 <label for="category">Category <span class="required">*</span></label>
@@ -179,25 +192,25 @@
                     <option value="salad">Salad</option>
                 </select>
             </div>
-
+            
             <!-- Servings -->
             <div class="form-group">
                 <label for="servings">Number of Servings <span class="required">*</span></label>
-                <input type="number" id="servings" name="servings" min="1" max="100" required placeholder="4">
+                <input type="number" id="servings" name="servings" required min="1" max="100" placeholder="4">
             </div>
-
+            
             <!-- Prep Time -->
             <div class="form-group">
                 <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="prepTime" name="prepTime" min="0" required placeholder="15">
+                <input type="number" id="prepTime" name="prepTime" required min="0" placeholder="15">
             </div>
-
+            
             <!-- Cook Time -->
             <div class="form-group">
                 <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="cookTime" name="cookTime" min="0" required placeholder="30">
+                <input type="number" id="cookTime" name="cookTime" required min="0" placeholder="30">
             </div>
-
+            
             <!-- Difficulty Level -->
             <div class="form-group">
                 <label for="difficulty">Difficulty Level <span class="required">*</span></label>
@@ -208,7 +221,7 @@
                     <option value="hard">Hard</option>
                 </select>
             </div>
-
+            
             <!-- Dietary Options -->
             <div class="form-group">
                 <label>Dietary Options</label>
@@ -221,46 +234,46 @@
                     <label><input type="checkbox" name="dietary[]" value="low-carb"> Low-Carb</label>
                 </div>
             </div>
-
+            
             <!-- Ingredients -->
             <div class="form-group">
                 <label for="ingredients">Ingredients <span class="required">*</span></label>
-                <textarea id="ingredients" name="ingredients" class="ingredients-list" required placeholder="List each ingredient on a new line, e.g.:
+                <textarea id="ingredients" name="ingredients" required class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:
 2 cups all-purpose flour
 1 cup sugar
 1/2 cup butter"></textarea>
                 <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
             </div>
-
+            
             <!-- Instructions -->
             <div class="form-group">
                 <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-                <textarea id="instructions" name="instructions" class="instructions-list" required placeholder="List each step on a new line, e.g.:
+                <textarea id="instructions" name="instructions" required class="instructions-list" placeholder="List each step on a new line, e.g.:
 1. Preheat oven to 350°F
 2. Mix dry ingredients in a bowl
 3. Add wet ingredients and stir"></textarea>
                 <p class="help-text">Enter one step per line, numbered if desired</p>
             </div>
-
+            
             <!-- Description -->
             <div class="form-group">
                 <label for="description">Recipe Description</label>
                 <textarea id="description" name="description" placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
             </div>
-
+            
             <!-- Image URL -->
             <div class="form-group">
                 <label for="imageUrl">Recipe Image URL</label>
                 <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/recipe-image.jpg">
                 <p class="help-text">Optional: Add a link to an image of your recipe</p>
             </div>
-
+            
             <!-- Author Name -->
             <div class="form-group">
                 <label for="authorName">Your Name</label>
                 <input type="text" id="authorName" name="authorName" placeholder="Your name (optional)">
             </div>
-
+            
             <!-- Button Group -->
             <div class="button-group">
                 <button type="submit" class="submit-btn">Submit Recipe</button>
@@ -268,36 +281,48 @@
             </div>
         </form>
     </div>
-
+    
     <script>
         // Form submission handler
         document.getElementById('recipeForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Collect form data
-            const formData = new FormData(this);
-            const recipeData = {};
+            // Hide any previous error messages
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.classList.remove('show');
             
-            for (let [key, value] of formData.entries()) {
-                if (key.includes('[]')) {
-                    const cleanKey = key.replace('[]', '');
-                    if (!recipeData[cleanKey]) {
-                        recipeData[cleanKey] = [];
+            try {
+                // Collect form data
+                const formData = new FormData(this);
+                const recipeData = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    if (key.includes('[]')) {
+                        const cleanKey = key.replace('[]', '');
+                        if (!recipeData[cleanKey]) {
+                            recipeData[cleanKey] = [];
+                        }
+                        recipeData[cleanKey].push(value);
+                    } else {
+                        recipeData[key] = value;
                     }
-                    recipeData[cleanKey].push(value);
-                } else {
-                    recipeData[key] = value;
                 }
+                
+                // In a real application, this would send data to a server
+                console.log('Recipe Data:', recipeData);
+                
+                // Simulate saving to localStorage (as a simple demo)
+                localStorage.setItem('lastRecipe', JSON.stringify(recipeData));
+                
+                // On success, redirect to home page
+                window.location.href = '/index.html';
+                
+            } catch (error) {
+                // On error, display error message on the page
+                console.error('Error submitting recipe:', error);
+                errorDiv.textContent = 'Error submitting recipe: ' + error.message + '. Please try again.';
+                errorDiv.classList.add('show');
             }
-            
-            // Display success message
-            alert('Recipe submitted successfully!\n\nRecipe: ' + recipeData.recipeName + '\nCategory: ' + recipeData.category);
-            
-            // In a real application, this would send data to a server
-            console.log('Recipe Data:', recipeData);
-            
-            // Optionally redirect back to home page
-            // window.location.href = 'index.html';
         });
     </script>
 </body>
