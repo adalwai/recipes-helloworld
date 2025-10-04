@@ -27,14 +27,17 @@ export async function onRequestPost(context) {
       });
     }
     
+    // Extract title for dedicated column
+    const title = recipeData.name || recipeData.title || 'Untitled Recipe';
+    
     // Store all dynamic fields as JSON in details column
     const details = JSON.stringify(recipeData);
     
-    // Insert into D1 database - only use id, details, created_at columns
+    // Insert into D1 database - use title, details, and created_at columns
     const result = await env.DB.prepare(
-      'INSERT INTO recipes (details, created_at) VALUES (?, datetime("now"))'
+      'INSERT INTO recipes (title, details, created_at) VALUES (?, ?, datetime("now"))'
     )
-    .bind(details)
+    .bind(title, details)
     .run();
     
     if (!result.success) {
@@ -74,7 +77,7 @@ export async function onRequestGet(context) {
     // If ID provided, get single recipe
     if (id) {
       const result = await env.DB.prepare(
-        'SELECT id, details, created_at FROM recipes WHERE id = ?'
+        'SELECT id, title, details, created_at FROM recipes WHERE id = ?'
       )
       .bind(id)
       .first();
@@ -90,6 +93,7 @@ export async function onRequestGet(context) {
       const details = JSON.parse(result.details);
       const recipe = {
         id: result.id,
+        title: result.title,
         created_at: result.created_at,
         ...details
       };
@@ -105,16 +109,16 @@ export async function onRequestGet(context) {
     
     // Otherwise, list all recipes with summary data
     const { results } = await env.DB.prepare(
-      'SELECT id, details, created_at FROM recipes ORDER BY created_at DESC'
+      'SELECT id, title, details, created_at FROM recipes ORDER BY created_at DESC'
     )
     .all();
     
-    // Extract summary data from JSON details
+    // Extract summary data using title column directly
     const recipes = results.map(row => {
       const details = JSON.parse(row.details);
       return {
         id: row.id,
-        name: details.name || details.title || 'Untitled Recipe',
+        name: row.title || 'Untitled Recipe',
         author: details.author || 'Anonymous',
         created_at: row.created_at,
         summary: {
