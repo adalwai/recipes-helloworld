@@ -177,7 +177,10 @@
                     throw new Error('Failed to fetch recipes');
                 }
                 
-                const recipes = await response.json();
+                const data = await response.json();
+                
+                // Extract recipes array from the response object
+                const recipes = data.recipes || [];
                 
                 // Clear loading message
                 container.innerHTML = '';
