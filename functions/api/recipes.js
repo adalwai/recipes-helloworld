@@ -18,27 +18,29 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' }
       });
     }
-    // Extract basic fields
-    const { name, author } = recipeData;
     
-    if (!name) {
-      return new Response(JSON.stringify({ error: 'Recipe name is required' }), {
+    // Validate that recipe has at least a name or title
+    if (!recipeData.name && !recipeData.title) {
+      return new Response(JSON.stringify({ error: 'Recipe name or title is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
+    
     // Store all dynamic fields as JSON in details column
     const details = JSON.stringify(recipeData);
     
-    // Insert into D1 database
+    // Insert into D1 database - only use id, details, created_at columns
     const result = await env.DB.prepare(
-      'INSERT INTO recipes (name, author, details, created_at) VALUES (?, ?, ?, datetime("now"))'
+      'INSERT INTO recipes (details, created_at) VALUES (?, datetime("now"))'
     )
-    .bind(name, author || 'Anonymous', details)
+    .bind(details)
     .run();
+    
     if (!result.success) {
       throw new Error('Failed to insert recipe');
     }
+    
     return new Response(JSON.stringify({ 
       success: true, 
       id: result.meta.last_row_id,
@@ -50,6 +52,7 @@ export async function onRequestPost(context) {
         'Access-Control-Allow-Origin': '*'
       }
     });
+    
   } catch (error) {
     console.error('Error saving recipe:', error);
     return new Response(JSON.stringify({ 
@@ -61,29 +64,36 @@ export async function onRequestPost(context) {
     });
   }
 }
+
 export async function onRequestGet(context) {
   try {
     const { env, request } = context;
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
+    
     // If ID provided, get single recipe
     if (id) {
       const result = await env.DB.prepare(
-        'SELECT id, name, author, details, created_at FROM recipes WHERE id = ?'
+        'SELECT id, details, created_at FROM recipes WHERE id = ?'
       )
       .bind(id)
       .first();
+      
       if (!result) {
         return new Response(JSON.stringify({ error: 'Recipe not found' }), {
           status: 404,
           headers: { 'Content-Type': 'application/json' }
         });
       }
-      // Parse details JSON
+      
+      // Parse details JSON and merge with base fields
+      const details = JSON.parse(result.details);
       const recipe = {
-        ...result,
-        details: JSON.parse(result.details)
+        id: result.id,
+        created_at: result.created_at,
+        ...details
       };
+      
       return new Response(JSON.stringify(recipe), {
         status: 200,
         headers: { 
@@ -92,18 +102,20 @@ export async function onRequestGet(context) {
         }
       });
     }
+    
     // Otherwise, list all recipes with summary data
     const { results } = await env.DB.prepare(
-      'SELECT id, name, author, details, created_at FROM recipes ORDER BY created_at DESC'
+      'SELECT id, details, created_at FROM recipes ORDER BY created_at DESC'
     )
     .all();
+    
     // Extract summary data from JSON details
     const recipes = results.map(row => {
       const details = JSON.parse(row.details);
       return {
         id: row.id,
-        name: row.name,
-        author: row.author,
+        name: details.name || details.title || 'Untitled Recipe',
+        author: details.author || 'Anonymous',
         created_at: row.created_at,
         summary: {
           cuisine: details.cuisine || null,
@@ -115,6 +127,7 @@ export async function onRequestGet(context) {
         }
       };
     });
+    
     return new Response(JSON.stringify({ 
       success: true,
       count: recipes.length,
@@ -126,6 +139,7 @@ export async function onRequestGet(context) {
         'Access-Control-Allow-Origin': '*'
       }
     });
+    
   } catch (error) {
     console.error('Error fetching recipes:', error);
     return new Response(JSON.stringify({ 
@@ -137,6 +151,7 @@ export async function onRequestGet(context) {
     });
   }
 }
+
 // Handle OPTIONS for CORS
 export async function onRequestOptions() {
   return new Response(null, {
