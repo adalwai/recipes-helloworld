@@ -175,21 +175,21 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a class="back-link" href="index.html">← Back to Home</a>
     
     <header>
         <h1>Add Your Recipe</h1>
     </header>
     
     <div class="form-container">
-        <div id="errorMessage" class="error-message"></div>
-        <div id="successMessage" class="success-message"></div>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
         
         <form id="recipeForm" method="post" action="#">
             <!-- Recipe Name -->
             <div class="form-group">
                 <label for="recipeName">Recipe Name <span class="required">*</span></label>
-                <input type="text" id="recipeName" name="recipeName" placeholder="e.g., Chocolate Chip Cookies" required>
+                <input type="text" id="recipeName" name="recipeName" required placeholder="e.g., Chocolate Chip Cookies">
             </div>
             
             <!-- Category -->
@@ -212,19 +212,19 @@
             <!-- Servings -->
             <div class="form-group">
                 <label for="servings">Number of Servings <span class="required">*</span></label>
-                <input type="number" id="servings" name="servings" min="1" max="100" placeholder="4" required>
+                <input type="number" id="servings" name="servings" required min="1" max="100" placeholder="4">
             </div>
             
             <!-- Prep Time -->
             <div class="form-group">
                 <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="prepTime" name="prepTime" min="0" placeholder="15" required>
+                <input type="number" id="prepTime" name="prepTime" required min="0" placeholder="15">
             </div>
             
             <!-- Cook Time -->
             <div class="form-group">
                 <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="cookTime" name="cookTime" min="0" placeholder="30" required>
+                <input type="number" id="cookTime" name="cookTime" required min="0" placeholder="30">
             </div>
             
             <!-- Difficulty Level -->
@@ -254,14 +254,14 @@
             <!-- Ingredients -->
             <div class="form-group">
                 <label for="ingredients">Ingredients <span class="required">*</span></label>
-                <textarea id="ingredients" name="ingredients" class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter" required></textarea>
+                <textarea id="ingredients" name="ingredients" required class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter"></textarea>
                 <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
             </div>
             
             <!-- Instructions -->
             <div class="form-group">
                 <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-                <textarea id="instructions" name="instructions" class="instructions-list" placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir" required></textarea>
+                <textarea id="instructions" name="instructions" required class="instructions-list" placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir"></textarea>
                 <p class="help-text">Enter one step per line, numbered if desired</p>
             </div>
             
@@ -339,10 +339,19 @@
                     body: JSON.stringify(recipeData)
                 });
                 
-                const result = await response.json();
+                // Try to parse the response as JSON
+                let result;
+                try {
+                    result = await response.json();
+                } catch (parseError) {
+                    result = { error: 'Invalid response from server' };
+                }
                 
+                // Check if the response was successful
                 if (!response.ok) {
-                    throw new Error(result.error || 'Failed to save recipe');
+                    // Display detailed error with HTTP status
+                    const errorMessage = result.error || result.message || 'Failed to save recipe';
+                    throw new Error(`HTTP ${response.status}: ${errorMessage}`);
                 }
                 
                 // On success, show success message and redirect
@@ -355,9 +364,9 @@
                 }, 1500);
                 
             } catch (error) {
-                // On error, display error message on the page
+                // On error, display detailed error message on the page
                 console.error('Error submitting recipe:', error);
-                errorDiv.textContent = 'Error submitting recipe: ' + error.message + '. Please try again.';
+                errorDiv.textContent = 'Error submitting recipe: ' + error.message;
                 errorDiv.classList.add('show');
                 
                 // Re-enable submit button
