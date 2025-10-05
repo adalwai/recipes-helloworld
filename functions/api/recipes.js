@@ -19,16 +19,16 @@ export async function onRequestPost(context) {
       });
     }
     
-    // Validate that recipe has at least a name or title
-    if (!recipeData.name && !recipeData.title) {
-      return new Response(JSON.stringify({ error: 'Recipe name or title is required' }), {
+    // Validate that recipe has at least a name, title, or recipeName
+    if (!recipeData.name && !recipeData.title && !recipeData.recipeName) {
+      return new Response(JSON.stringify({ error: 'Recipe name, title, or recipeName is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
     
-    // Extract title for dedicated column
-    const title = recipeData.name || recipeData.title || 'Untitled Recipe';
+    // Extract title for dedicated column - support recipeName, name, or title
+    const title = recipeData.recipeName || recipeData.name || recipeData.title || 'Untitled Recipe';
     
     // Store all dynamic fields as JSON in details column
     const details = JSON.stringify(recipeData);
@@ -94,6 +94,7 @@ export async function onRequestGet(context) {
       const recipe = {
         id: result.id,
         title: result.title,
+        recipeName: result.title,  // Add recipeName for compatibility
         created_at: result.created_at,
         ...details
       };
@@ -119,6 +120,8 @@ export async function onRequestGet(context) {
       return {
         id: row.id,
         name: row.title || 'Untitled Recipe',
+        title: row.title || 'Untitled Recipe',  // Add title for compatibility
+        recipeName: row.title || 'Untitled Recipe',  // Add recipeName for compatibility
         author: details.author || 'Anonymous',
         created_at: row.created_at,
         summary: {
