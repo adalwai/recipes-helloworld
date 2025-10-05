@@ -30,14 +30,17 @@ export async function onRequestPost(context) {
     // Extract title for dedicated column - support recipeName, name, or title
     const title = recipeData.recipeName || recipeData.name || recipeData.title || 'Untitled Recipe';
     
+    // Extract category with default fallback
+    const category = recipeData.category || 'Uncategorized';
+    
     // Store all dynamic fields as JSON in details column
     const details = JSON.stringify(recipeData);
     
-    // Insert into D1 database - use title, details, and created_at columns
+    // Insert into D1 database - use title, category, details, and created_at columns
     const result = await env.DB.prepare(
-      'INSERT INTO recipes (title, details, created_at) VALUES (?, ?, datetime("now"))'
+      'INSERT INTO recipes (title, category, details, created_at) VALUES (?, ?, ?, datetime("now"))'
     )
-    .bind(title, details)
+    .bind(title, category, details)
     .run();
     
     if (!result.success) {
@@ -77,7 +80,7 @@ export async function onRequestGet(context) {
     // If ID provided, get single recipe
     if (id) {
       const result = await env.DB.prepare(
-        'SELECT id, title, details, created_at FROM recipes WHERE id = ?'
+        'SELECT id, title, category, details, created_at FROM recipes WHERE id = ?'
       )
       .bind(id)
       .first();
@@ -95,6 +98,7 @@ export async function onRequestGet(context) {
         id: result.id,
         title: result.title,
         recipeName: result.title,  // Add recipeName for compatibility
+        category: result.category,
         created_at: result.created_at,
         ...details
       };
@@ -110,11 +114,11 @@ export async function onRequestGet(context) {
     
     // Otherwise, list all recipes with summary data
     const { results } = await env.DB.prepare(
-      'SELECT id, title, details, created_at FROM recipes ORDER BY created_at DESC'
+      'SELECT id, title, category, details, created_at FROM recipes ORDER BY created_at DESC'
     )
     .all();
     
-    // Extract summary data using title column directly
+    // Extract summary data using title and category columns directly
     const recipes = results.map(row => {
       const details = JSON.parse(row.details);
       return {
@@ -122,6 +126,7 @@ export async function onRequestGet(context) {
         name: row.title || 'Untitled Recipe',
         title: row.title || 'Untitled Recipe',  // Add title for compatibility
         recipeName: row.title || 'Untitled Recipe',  // Add recipeName for compatibility
+        category: row.category || 'Uncategorized',
         author: details.author || 'Anonymous',
         created_at: row.created_at,
         summary: {
