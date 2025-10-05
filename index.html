@@ -161,11 +161,11 @@
             <div class="loading">Loading recipes...</div>
         </div>
     </div>
-
+    
     <script>
         // API endpoint - adjust this to your backend API URL
         const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
-
+        
         // Function to fetch recipes from the backend
         async function fetchRecipes() {
             const container = document.getElementById('recipesContainer');
@@ -207,16 +207,19 @@
                 `;
             }
         }
-
+        
         // Function to create a recipe card element
         function createRecipeCard(recipe) {
             const card = document.createElement('div');
             card.className = 'recipe-card';
             
+            // Get recipe title - support both recipeName and title fields
+            const recipeTitle = recipe.recipeName || recipe.title || recipe.name || 'Untitled Recipe';
+            
             // Create image or placeholder
             let imageHTML;
             if (recipe.imageUrl) {
-                imageHTML = `<img src="${recipe.imageUrl}" alt="${recipe.recipeName}" class="recipe-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                imageHTML = `<img src="${recipe.imageUrl}" alt="${recipeTitle}" class="recipe-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                             <div class="recipe-image-placeholder" style="display: none;">🍽️</div>`;
             } else {
                 imageHTML = '<div class="recipe-image-placeholder">🍽️</div>';
@@ -226,7 +229,7 @@
             card.innerHTML = `
                 ${imageHTML}
                 <div class="recipe-content">
-                    <div class="recipe-title">${recipe.recipeName || 'Untitled Recipe'}</div>
+                    <div class="recipe-title">${recipeTitle}</div>
                     <div class="recipe-category">${recipe.category || 'Uncategorized'}</div>
                     ${recipe.description ? `<p style="color: #666; font-size: 14px; margin-top: 10px;">${recipe.description.substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>` : ''}
                     <div class="recipe-meta">
@@ -239,7 +242,7 @@
             
             return card;
         }
-
+        
         // Load recipes when page loads
         document.addEventListener('DOMContentLoaded', fetchRecipes);
     </script>
