@@ -133,6 +133,10 @@
         .submit-btn:hover {
             background-color: #45a049;
         }
+        .submit-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
         .reset-btn {
             background-color: #f44336;
             color: white;
@@ -157,6 +161,17 @@
         .error-message.show {
             display: block;
         }
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .success-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -168,6 +183,7 @@
     
     <div class="form-container">
         <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
         
         <form id="recipeForm" method="post" action="#">
             <!-- Recipe Name -->
@@ -238,24 +254,21 @@
             <!-- Ingredients -->
             <div class="form-group">
                 <label for="ingredients">Ingredients <span class="required">*</span></label>
-                <textarea id="ingredients" name="ingredients" class="ingredients-list" 
-                    placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter" required></textarea>
+                <textarea id="ingredients" name="ingredients" class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter" required></textarea>
                 <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
             </div>
             
             <!-- Instructions -->
             <div class="form-group">
                 <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-                <textarea id="instructions" name="instructions" class="instructions-list" 
-                    placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir" required></textarea>
+                <textarea id="instructions" name="instructions" class="instructions-list" placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir" required></textarea>
                 <p class="help-text">Enter one step per line, numbered if desired</p>
             </div>
             
             <!-- Description -->
             <div class="form-group">
                 <label for="description">Recipe Description</label>
-                <textarea id="description" name="description" 
-                    placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
+                <textarea id="description" name="description" placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
             </div>
             
             <!-- Image URL -->
@@ -281,12 +294,19 @@
     
     <script>
         // Form submission handler
-        document.getElementById('recipeForm').addEventListener('submit', function(e) {
+        document.getElementById('recipeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Hide any previous error messages
+            // Hide any previous messages
             const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
             errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+            
+            // Disable submit button to prevent double submission
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
             
             try {
                 // Collect form data
@@ -310,20 +330,39 @@
                     recipeData.title = recipeData.recipeName;
                 }
                 
-                // In a real application, this would send data to a server
-                console.log('Recipe Data:', recipeData);
+                // Send data to backend API
+                const response = await fetch('/api/recipes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recipeData)
+                });
                 
-                // Simulate saving to localStorage (as a simple demo)
-                localStorage.setItem('lastRecipe', JSON.stringify(recipeData));
+                const result = await response.json();
                 
-                // On success, redirect to home page
-                window.location.href = '/index.html';
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to save recipe');
+                }
+                
+                // On success, show success message and redirect
+                successDiv.textContent = 'Recipe saved successfully! Redirecting...';
+                successDiv.classList.add('show');
+                
+                // Redirect to home page after a short delay
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1500);
                 
             } catch (error) {
                 // On error, display error message on the page
                 console.error('Error submitting recipe:', error);
                 errorDiv.textContent = 'Error submitting recipe: ' + error.message + '. Please try again.';
                 errorDiv.classList.add('show');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Recipe';
             }
         });
     </script>
