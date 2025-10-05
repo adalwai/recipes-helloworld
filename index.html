@@ -73,6 +73,9 @@
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
         .recipe-card:hover {
             transform: translateY(-5px);
@@ -149,7 +152,7 @@
 </head>
 <body>
     <header>
-        <h1>Recipe Collection</h1>
+        <h1>🍽️ Recipe Collection</h1>
     </header>
     
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
@@ -210,8 +213,9 @@
         
         // Function to create a recipe card element
         function createRecipeCard(recipe) {
-            const card = document.createElement('div');
+            const card = document.createElement('a');
             card.className = 'recipe-card';
+            card.href = `/view-recipe.html?id=${recipe.id}`;
             
             // Get recipe title - support both recipeName and title fields
             const recipeTitle = recipe.recipeName || recipe.title || recipe.name || 'Untitled Recipe';
