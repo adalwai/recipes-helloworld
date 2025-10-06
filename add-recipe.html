@@ -1,379 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Recipe - Recipe Collection</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
-        h1 {
-            font-size: 28px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-        .form-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        .required {
-            color: red;
-        }
-        input[type="text"],
-        input[type="number"],
-        input[type="url"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: Arial, sans-serif;
-        }
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="url"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #4CAF50;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .ingredients-list,
-        .instructions-list {
-            min-height: 150px;
-        }
-        input[type="number"] {
-            width: 150px;
-        }
-        .checkbox-group {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-        .checkbox-group label {
-            display: flex;
-            align-items: center;
-            font-weight: normal;
-            margin-bottom: 0;
-        }
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            margin-right: 5px;
-        }
-        .time-inputs {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        .time-inputs input {
-            width: 100px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-        button {
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            flex: 1;
-        }
-        .submit-btn:hover {
-            background-color: #45a049;
-        }
-        .submit-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .reset-btn {
-            background-color: #f44336;
-            color: white;
-        }
-        .reset-btn:hover {
-            background-color: #da190b;
-        }
-        .help-text {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        .error-message {
-            background-color: #f44336;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error-message.show {
-            display: block;
-        }
-        .success-message {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .success-message.show {
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Recipe - Recipe Collection</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+    header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 5px; margin-bottom: 30px; position: relative; }
+    h1 { font-size: 28px; }
+    .back-link { display: inline-block; margin-bottom: 20px; color: #4CAF50; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+    .form-container { background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+    .required { color: red; }
+    input[type="text"], input[type="number"], input[type="url"], select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: Arial, sans-serif; }
+    input[type="text"]:focus, input[type="number"]:focus, input[type="url"]:focus, select:focus, textarea:focus { outline: none; border-color: #4CAF50; }
+    textarea { resize: vertical; min-height: 100px; }
+    .ingredients-list, .instructions-list { min-height: 150px; }
+    input[type="number"] { width: 150px; }
+    .checkbox-group { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+    .checkbox-group label { display: flex; align-items: center; font-weight: normal; margin-bottom: 0; }
+    .checkbox-group input[type="checkbox"] { width: auto; margin-right: 5px; }
+    .time-inputs { display: flex; gap: 15px; align-items: center; }
+    .time-inputs input { width: 100px; }
+    .button-group { display: flex; gap: 10px; margin-top: 30px; }
+    button { padding: 12px 30px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
+    .submit-btn { background-color: #4CAF50; color: white; flex: 1; }
+    .submit-btn:hover { background-color: #45a049; }
+    .submit-btn:disabled { background-color: #cccccc; cursor: not-allowed; }
+    .reset-btn { background-color: #f44336; color: white; }
+    .reset-btn:hover { background-color: #da190b; }
+    .help-text { font-size: 12px; color: #666; margin-top: 5px; font-style: italic; }
+    .error-message { background-color: #f44336; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+    .error-message.show { display: block; }
+    .success-message { background-color: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+    .success-message.show { display: block; }
+    /* User status styles */
+    .user-status { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 13px; background: rgba(255,255,255,0.15); padding: 6px 10px; border-radius: 999px; display: flex; align-items: center; gap: 8px; }
+    .user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; background: #fff; }
+    .user-status .email { font-weight: 600; }
+  </style>
 </head>
 <body>
-    <a class="back-link" href="index.html">← Back to Home</a>
-    
-    <header>
-        <h1>Add Your Recipe</h1>
-    </header>
-    
-    <div class="form-container">
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
-        
-        <form id="recipeForm" method="post" action="#">
-            <!-- Recipe Name -->
-            <div class="form-group">
-                <label for="recipeName">Recipe Name <span class="required">*</span></label>
-                <input type="text" id="recipeName" name="recipeName" required placeholder="e.g., Chocolate Chip Cookies">
-            </div>
-            
-            <!-- Category -->
-            <div class="form-group">
-                <label for="category">Category <span class="required">*</span></label>
-                <select id="category" name="category" required>
-                    <option value="">Select a category</option>
-                    <option value="appetizer">Appetizer</option>
-                    <option value="breakfast">Breakfast</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                    <option value="dessert">Dessert</option>
-                    <option value="snack">Snack</option>
-                    <option value="beverage">Beverage</option>
-                    <option value="soup">Soup</option>
-                    <option value="salad">Salad</option>
-                </select>
-            </div>
-            
-            <!-- Servings -->
-            <div class="form-group">
-                <label for="servings">Number of Servings <span class="required">*</span></label>
-                <input type="number" id="servings" name="servings" required min="1" max="100" placeholder="4">
-            </div>
-            
-            <!-- Prep Time -->
-            <div class="form-group">
-                <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="prepTime" name="prepTime" required min="0" placeholder="15">
-            </div>
-            
-            <!-- Cook Time -->
-            <div class="form-group">
-                <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
-                <input type="number" id="cookTime" name="cookTime" required min="0" placeholder="30">
-            </div>
-            
-            <!-- Difficulty Level -->
-            <div class="form-group">
-                <label for="difficulty">Difficulty Level <span class="required">*</span></label>
-                <select id="difficulty" name="difficulty" required>
-                    <option value="">Select difficulty</option>
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-            </div>
-            
-            <!-- Dietary Options -->
-            <div class="form-group">
-                <label>Dietary Options</label>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="dietary[]" value="vegetarian"> Vegetarian</label>
-                    <label><input type="checkbox" name="dietary[]" value="vegan"> Vegan</label>
-                    <label><input type="checkbox" name="dietary[]" value="gluten-free"> Gluten-Free</label>
-                    <label><input type="checkbox" name="dietary[]" value="dairy-free"> Dairy-Free</label>
-                    <label><input type="checkbox" name="dietary[]" value="nut-free"> Nut-Free</label>
-                    <label><input type="checkbox" name="dietary[]" value="low-carb"> Low-Carb</label>
-                </div>
-            </div>
-            
-            <!-- Ingredients -->
-            <div class="form-group">
-                <label for="ingredients">Ingredients <span class="required">*</span></label>
-                <textarea id="ingredients" name="ingredients" required class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter"></textarea>
-                <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
-            </div>
-            
-            <!-- Instructions -->
-            <div class="form-group">
-                <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-                <textarea id="instructions" name="instructions" required class="instructions-list" placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir"></textarea>
-                <p class="help-text">Enter one step per line, numbered if desired</p>
-            </div>
-            
-            <!-- Description -->
-            <div class="form-group">
-                <label for="description">Recipe Description</label>
-                <textarea id="description" name="description" placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
-            </div>
-            
-            <!-- Image URL -->
-            <div class="form-group">
-                <label for="imageUrl">Recipe Image URL</label>
-                <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/recipe-image.jpg">
-                <p class="help-text">Optional: Add a link to an image of your recipe</p>
-            </div>
-            
-            <!-- Author Name -->
-            <div class="form-group">
-                <label for="authorName">Your Name</label>
-                <input type="text" id="authorName" name="authorName" placeholder="Your name (optional)">
-            </div>
-            
-            <!-- Button Group -->
-            <div class="button-group">
-                <button type="submit" class="submit-btn">Submit Recipe</button>
-                <button type="reset" class="reset-btn">Clear Form</button>
-            </div>
-        </form>
+  <a class="back-link" href="index.html">← Back to Home</a>
+  <header>
+    <h1>Add Your Recipe</h1>
+    <div id="userStatus" class="user-status" aria-live="polite" title="Sign-in status">
+      <span id="userStatusText">Checking sign-in…</span>
     </div>
-    
-    <script>
-        // Form submission handler
-        document.getElementById('recipeForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Hide any previous messages
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
-            errorDiv.classList.remove('show');
-            successDiv.classList.remove('show');
-            
-            // Disable submit button to prevent double submission
-            const submitBtn = this.querySelector('.submit-btn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            try {
-                // Collect form data
-                const formData = new FormData(this);
-                const recipeData = {};
-                
-                for (let [key, value] of formData.entries()) {
-                    if (key.includes('[]')) {
-                        const cleanKey = key.replace('[]', '');
-                        if (!recipeData[cleanKey]) {
-                            recipeData[cleanKey] = [];
-                        }
-                        recipeData[cleanKey].push(value);
-                    } else {
-                        recipeData[key] = value;
-                    }
-                }
-                
-                // Add both 'title' and 'recipeName' fields for compatibility
-                if (recipeData.recipeName) {
-                    recipeData.title = recipeData.recipeName;
-                }
-                
-                // Send data to backend API
-                const response = await fetch('/api/recipes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(recipeData)
-                });
-                
-                // Try to parse the response as JSON
-                let result;
-                try {
-                    result = await response.json();
-                } catch (parseError) {
-                    result = { error: 'Invalid response from server' };
-                }
-                
-                // Check if the response was successful
-                if (!response.ok) {
-                    // Display detailed error with HTTP status
-                    const errorMessage = result.error || result.message || 'Failed to save recipe';
-                    throw new Error(`HTTP ${response.status}: ${errorMessage}`);
-                }
-                
-                // On success, show success message and redirect
-                successDiv.textContent = 'Recipe saved successfully! Redirecting...';
-                successDiv.classList.add('show');
-                
-                // Redirect to home page after a short delay
-                setTimeout(() => {
-                    window.location.href = '/index.html';
-                }, 1500);
-                
-            } catch (error) {
-                // On error, display detailed error message on the page
-                console.error('Error submitting recipe:', error);
-                errorDiv.textContent = 'Error submitting recipe: ' + error.message;
-                errorDiv.classList.add('show');
-                
-                // Re-enable submit button
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Recipe';
-            }
+  </header>
+
+  <div class="form-container">
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <form id="recipeForm" method="post" action="#">
+      <!-- Recipe Name -->
+      <div class="form-group">
+        <label for="recipeName">Recipe Name <span class="required">*</span></label>
+        <input id="recipeName" name="recipeName" type="text" placeholder="e.g., Chocolate Chip Cookies" required />
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="category">Category <span class="required">*</span></label>
+        <select id="category" name="category" required>
+          <option value="">Select a category</option>
+          <option value="appetizer">Appetizer</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="dinner">Dinner</option>
+          <option value="dessert">Dessert</option>
+          <option value="snack">Snack</option>
+          <option value="beverage">Beverage</option>
+          <option value="soup">Soup</option>
+          <option value="salad">Salad</option>
+        </select>
+      </div>
+
+      <!-- Servings -->
+      <div class="form-group">
+        <label for="servings">Number of Servings <span class="required">*</span></label>
+        <input id="servings" name="servings" type="number" min="1" max="100" placeholder="4" required />
+      </div>
+
+      <!-- Prep Time -->
+      <div class="form-group">
+        <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
+        <input id="prepTime" name="prepTime" type="number" min="0" placeholder="15" required />
+      </div>
+
+      <!-- Cook Time -->
+      <div class="form-group">
+        <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
+        <input id="cookTime" name="cookTime" type="number" min="0" placeholder="30" required />
+      </div>
+
+      <!-- Difficulty Level -->
+      <div class="form-group">
+        <label for="difficulty">Difficulty Level <span class="required">*</span></label>
+        <select id="difficulty" name="difficulty" required>
+          <option value="">Select difficulty</option>
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      <!-- Dietary Options -->
+      <div class="form-group">
+        Dietary Options
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="dietary[]" value="vegetarian" /> Vegetarian</label>
+          <label><input type="checkbox" name="dietary[]" value="vegan" /> Vegan</label>
+          <label><input type="checkbox" name="dietary[]" value="gluten-free" /> Gluten-Free</label>
+          <label><input type="checkbox" name="dietary[]" value="dairy-free" /> Dairy-Free</label>
+          <label><input type="checkbox" name="dietary[]" value="nut-free" /> Nut-Free</label>
+          <label><input type="checkbox" name="dietary[]" value="low-carb" /> Low-Carb</label>
+        </div>
+      </div>
+
+      <!-- Ingredients -->
+      <div class="form-group">
+        <label for="ingredients">Ingredients <span class="required">*</span></label>
+        <textarea id="ingredients" name="ingredients" class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:&#10;2 cups all-purpose flour&#10;1 cup sugar&#10;1/2 cup butter" required></textarea>
+        <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
+      </div>
+
+      <!-- Instructions -->
+      <div class="form-group">
+        <label for="instructions">Cooking Instructions <span class="required">*</span></label>
+        <textarea id="instructions" name="instructions" class="instructions-list" placeholder="List each step on a new line, e.g.:&#10;1. Preheat oven to 350°F&#10;2. Mix dry ingredients in a bowl&#10;3. Add wet ingredients and stir" required></textarea>
+        <p class="help-text">Enter one step per line, numbered if desired</p>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label for="description">Recipe Description</label>
+        <textarea id="description" name="description" placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
+      </div>
+
+      <!-- Image URL -->
+      <div class="form-group">
+        <label for="imageUrl">Recipe Image URL</label>
+        <input id="imageUrl" name="imageUrl" type="url" placeholder="https://example.com/recipe-image.jpg" />
+        <p class="help-text">Optional: Add a link to an image of your recipe</p>
+      </div>
+
+      <!-- Author Name -->
+      <div class="form-group">
+        <label for="authorName">Your Name</label>
+        <input id="authorName" name="authorName" type="text" placeholder="Your name (optional)" />
+      </div>
+
+      <!-- Button Group -->
+      <div class="button-group">
+        <button class="submit-btn" type="submit">Submit Recipe</button>
+        <button class="reset-btn" type="reset">Clear Form</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Cloudflare Access + Google sign-in status UI
+    async function getUserFromCfAccess() {
+      try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) throw new Error('no auth endpoint');
+        const data = await res.json();
+        if (data && (data.email || data.name)) return data;
+        throw new Error('no user');
+      } catch (e) {
+        try {
+          if (window.__CF_ACCESS_JWT) {
+            const payload = JSON.parse(atob(window.__CF_ACCESS_JWT.split('.')[1]));
+            return {
+              email: payload.email || payload.sub || 'unknown@user',
+              name: payload.name || payload.given_name || payload.family_name || 'Signed-in user',
+              picture: payload.picture
+            };
+          }
+        } catch {}
+        return null;
+      }
+    }
+
+    function updateUserStatus(user) {
+      const container = document.getElementById('userStatus');
+      const text = document.getElementById('userStatusText');
+      if (!container || !text) return;
+      if (user) {
+        const email = user.email || '';
+        const name = user.name || '';
+        text.innerHTML = (user.picture ? `<img class="user-avatar" src="${user.picture}" alt="avatar" />` : '') +
+                         `<span class="email">${email}</span>${name ? ` · ${name}` : ''}`;
+        container.title = 'Signed in via Google';
+      } else {
+        text.textContent = 'Not signed in';
+        container.title = 'Not signed in';
+      }
+    }
+
+    (async () => {
+      const user = await getUserFromCfAccess();
+      updateUserStatus(user);
+    })();
+
+    // Existing form submission handler
+    document.getElementById('recipeForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errorDiv = document.getElementById('errorMessage');
+      const successDiv = document.getElementById('successMessage');
+      errorDiv.classList.remove('show');
+      successDiv.classList.remove('show');
+      const submitBtn = this.querySelector('.submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+      try {
+        const formData = new FormData(this);
+        const recipeData = {};
+        for (let [key, value] of formData.entries()) {
+          if (key.includes('[]')) {
+            const cleanKey = key.replace('[]', '');
+            if (!recipeData[cleanKey]) recipeData[cleanKey] = [];
+            recipeData[cleanKey].push(value);
+          } else {
+            recipeData[key] = value;
+          }
+        }
+        if (recipeData.recipeName) {
+          recipeData.title = recipeData.recipeName;
+        }
+        const response = await fetch('/api/recipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(recipeData)
         });
-    </script>
+        let result;
+        try { result = await response.json(); } catch { result = { error: 'Invalid response from server' }; }
+        if (!response.ok) {
+          const errorMessage = result.error || result.message || 'Failed to save recipe';
+          throw new Error(`HTTP ${response.status}: ${errorMessage}`);
+        }
+        successDiv.textContent = 'Recipe saved successfully! Redirecting...';
+        successDiv.classList.add('show');
+        setTimeout(() => { window.location.href = '/index.html'; }, 1500);
+      } catch (error) {
+        console.error('Error submitting recipe:', error);
+        errorDiv.textContent = 'Error submitting recipe: ' + error.message;
+        errorDiv.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Recipe';
+      }
+    });
+  </script>
 </body>
 </html>
