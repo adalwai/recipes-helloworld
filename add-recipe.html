@@ -48,7 +48,7 @@
     <a class="back-link" href="index.html">← Back to Home</a>
     <header>
       <h1>Add Your Recipe</h1>
-      <div class="user-status" id="userStatus" aria-live="polite" title="Sign-in status">
+      <div class="user-status" id="userStatus" title="Sign-in status" aria-live="polite">
         <span id="userStatusText">Checking sign-in…</span>
       </div>
     </header>
@@ -59,7 +59,7 @@
         <!-- Recipe Name -->
         <div class="form-group">
           <label for="recipeName">Recipe Name <span class="required">*</span></label>
-          <input type="text" id="recipeName" name="recipeName" required placeholder="e.g., Chocolate Chip Cookies">
+          <input type="text" id="recipeName" name="recipeName" placeholder="e.g., Chocolate Chip Cookies" required />
         </div>
         <!-- Category -->
         <div class="form-group">
@@ -80,17 +80,17 @@
         <!-- Servings -->
         <div class="form-group">
           <label for="servings">Number of Servings <span class="required">*</span></label>
-          <input type="number" id="servings" name="servings" required min="1" max="100" placeholder="4">
+          <input type="number" id="servings" name="servings" min="1" max="100" placeholder="4" required />
         </div>
         <!-- Prep Time -->
         <div class="form-group">
           <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
-          <input type="number" id="prepTime" name="prepTime" required min="0" placeholder="15">
+          <input type="number" id="prepTime" name="prepTime" min="0" placeholder="15" required />
         </div>
         <!-- Cook Time -->
         <div class="form-group">
           <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
-          <input type="number" id="cookTime" name="cookTime" required min="0" placeholder="30">
+          <input type="number" id="cookTime" name="cookTime" min="0" placeholder="30" required />
         </div>
         <!-- Difficulty Level -->
         <div class="form-group">
@@ -106,30 +106,30 @@
         <div class="form-group">
           <label>Dietary Options</label>
           <div class="checkbox-group">
-            <label><input type="checkbox" name="dietary[]" value="vegetarian"> Vegetarian</label>
-            <label><input type="checkbox" name="dietary[]" value="vegan"> Vegan</label>
-            <label><input type="checkbox" name="dietary[]" value="gluten-free"> Gluten-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="dairy-free"> Dairy-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="nut-free"> Nut-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="low-carb"> Low-Carb</label>
+            <label><input type="checkbox" name="dietary[]" value="vegetarian" /> Vegetarian</label>
+            <label><input type="checkbox" name="dietary[]" value="vegan" /> Vegan</label>
+            <label><input type="checkbox" name="dietary[]" value="gluten-free" /> Gluten-Free</label>
+            <label><input type="checkbox" name="dietary[]" value="dairy-free" /> Dairy-Free</label>
+            <label><input type="checkbox" name="dietary[]" value="nut-free" /> Nut-Free</label>
+            <label><input type="checkbox" name="dietary[]" value="low-carb" /> Low-Carb</label>
           </div>
         </div>
         <!-- Ingredients -->
         <div class="form-group">
           <label for="ingredients">Ingredients <span class="required">*</span></label>
-          <textarea id="ingredients" name="ingredients" required class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:
+          <textarea id="ingredients" name="ingredients" class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:
 2 cups all-purpose flour
 1 cup sugar
-1/2 cup butter"></textarea>
+1/2 cup butter" required></textarea>
           <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
         </div>
         <!-- Instructions -->
         <div class="form-group">
           <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-          <textarea id="instructions" name="instructions" required class="instructions-list" placeholder="List each step on a new line, e.g.:
+          <textarea id="instructions" name="instructions" class="instructions-list" placeholder="List each step on a new line, e.g.:
 1. Preheat oven to 350°F
 2. Mix dry ingredients in a bowl
-3. Add wet ingredients and stir"></textarea>
+3. Add wet ingredients and stir" required></textarea>
           <p class="help-text">Enter one step per line, numbered if desired</p>
         </div>
         <!-- Description -->
@@ -140,13 +140,13 @@
         <!-- Image URL -->
         <div class="form-group">
           <label for="imageUrl">Recipe Image URL</label>
-          <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/recipe-image.jpg">
+          <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/recipe-image.jpg" />
           <p class="help-text">Optional: Add a link to an image of your recipe</p>
         </div>
         <!-- Author Name -->
         <div class="form-group">
           <label for="authorName">Your Name</label>
-          <input type="text" id="authorName" name="authorName" placeholder="Your name (optional)">
+          <input type="text" id="authorName" name="authorName" placeholder="Your name (optional)" />
         </div>
         <!-- Button Group -->
         <div class="button-group">
@@ -195,7 +195,7 @@
       });
     </script>
     <!-- Unified header auth script -->
-    <script src="/functions/api/header.js"></script>
+    <script src="/source_code/header.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', initHeaderAuth);
     </script>
