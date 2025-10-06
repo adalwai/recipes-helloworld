@@ -29,6 +29,22 @@
         h1 {
             font-size: 32px;
         }
+        .user-info {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .user-info.visible {
+            display: block;
+        }
+        .user-name {
+            font-weight: bold;
+        }
         .welcome-message {
             text-align: center;
             color: #666;
@@ -140,6 +156,9 @@
 <body>
     <header>
         <h1>🍽️ Recipe Collection</h1>
+        <div class="user-info" id="userInfo">
+            <span class="user-name" id="userName"></span>
+        </div>
     </header>
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
     <a href="add-recipe.html" class="add-recipe-link" id="addRecipeButton">+ Add Recipe</a>
@@ -152,7 +171,48 @@
     <script>
         // API endpoint - adjust this to your backend API URL
         const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
+        const AUTH_API_URL = '/api/auth/verify'; // Backend endpoint to verify auth and get user info
   
+        // Function to check authentication and display user info
+        async function checkAuthAndDisplayUser() {
+            try {
+                // Check if there's a token in localStorage or sessionStorage
+                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+                
+                if (!token) {
+                    console.log('No auth token found');
+                    return;
+                }
+
+                // Verify token with backend and get user info
+                const response = await fetch(AUTH_API_URL, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const userData = await response.json();
+                    
+                    // Display user's full name if available
+                    if (userData && (userData.name || userData.fullName || userData.displayName)) {
+                        const userName = userData.name || userData.fullName || userData.displayName;
+                        const userInfoDiv = document.getElementById('userInfo');
+                        const userNameSpan = document.getElementById('userName');
+                        
+                        userNameSpan.textContent = userName;
+                        userInfoDiv.classList.add('visible');
+                    }
+                } else {
+                    console.log('Auth verification failed:', response.status);
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
+            }
+        }
+
         // Function to fetch all recipes from the backend
         async function fetchRecipes() {
             const container = document.getElementById('recipesContainer');
@@ -247,8 +307,9 @@
             return card;
         }
         
-        // Load recipes when page loads
+        // Load recipes and check auth when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            checkAuthAndDisplayUser();
             fetchRecipes();
         });
     </script>
