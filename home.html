@@ -1,317 +1,312 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Recipe Collection - Hello World</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px;
-            margin-bottom: 30px;
-            position: relative;
-        }
-        h1 {
-            font-size: 32px;
-        }
-        .user-info {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background-color: rgba(255, 255, 255, 0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: none;
-        }
-        .user-info.visible {
-            display: block;
-        }
-        .user-name {
-            font-weight: bold;
-        }
-        .welcome-message {
-            text-align: center;
-            color: #666;
-            margin: 20px 0 30px 0;
-            font-size: 16px;
-        }
-        .add-recipe-link {
-            display: block;
-            width: 200px;
-            margin: 0 auto 40px auto;
-            padding: 15px 30px;
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        .add-recipe-link:hover {
-            background-color: #45a049;
-        }
-        .recipes-section {
-            margin-top: 40px;
-        }
-        .recipes-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-        .recipes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .recipe-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-        .recipe-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .recipe-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-        .recipe-image-placeholder {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-        }
-        .recipe-content {
-            padding: 20px;
-        }
-        .recipe-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .recipe-category {
-            color: #4CAF50;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        .recipe-meta {
-            display: flex;
-            gap: 15px;
-            margin-top: 12px;
-            color: #666;
-            font-size: 14px;
-        }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            font-size: 18px;
-        }
-        .error-message {
-            background-color: #ffebee;
-            color: #c62828;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .no-recipes {
-            text-align: center;
-            padding: 60px 20px;
-            color: #999;
-            font-size: 18px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      header {
+        background-color: #4caf50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        position: relative;
+      }
+      h1 {
+        font-size: 32px;
+      }
+      .user-info {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        display: none;
+      }
+      .user-info.visible {
+        display: block;
+      }
+      .user-name {
+        font-weight: bold;
+      }
+      .welcome-message {
+        text-align: center;
+        color: #666;
+        margin: 20px 0 30px 0;
+        font-size: 16px;
+      }
+      .add-recipe-link {
+        display: block;
+        width: 200px;
+        margin: 0 auto 40px auto;
+        padding: 15px 30px;
+        background-color: #4caf50;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+      }
+      .add-recipe-link:hover {
+        background-color: #45a049;
+      }
+      .recipes-section {
+        margin-top: 40px;
+      }
+      .recipes-section h2 {
+        color: #333;
+        margin-bottom: 20px;
+        font-size: 24px;
+        text-align: center;
+      }
+      .recipes-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+      .recipe-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .recipe-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .recipe-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+      .recipe-image-placeholder {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 64px;
+      }
+      .recipe-content {
+        padding: 20px;
+      }
+      .recipe-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 8px;
+      }
+      .recipe-category {
+        color: #4caf50;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      .recipe-meta {
+        display: flex;
+        gap: 15px;
+        margin-top: 12px;
+        color: #666;
+        font-size: 14px;
+      }
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 18px;
+      }
+      .error-message {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+      }
+      .no-recipes {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+        font-size: 18px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <h1>🍽️ Recipe Collection</h1>
-        <div class="user-info" id="userInfo">
-            <span class="user-name" id="userName"></span>
-        </div>
+      <h1>🍽️ Recipe Collection</h1>
+      <div id="userInfo" class="user-info">
+        <span id="userName" class="user-name"></span>
+      </div>
     </header>
+
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
-    <a href="add-recipe.html" class="add-recipe-link" id="addRecipeButton">+ Add Recipe</a>
+    <a id="addRecipeButton" class="add-recipe-link" href="add-recipe.html">+ Add Recipe</a>
+
     <div class="recipes-section">
-        <h2>All Recipes</h2>
-        <div class="recipes-container" id="recipesContainer">
-            <div class="loading">Loading recipes...</div>
-        </div>
+      <h2>All Recipes</h2>
+      <div id="recipesContainer" class="recipes-container">
+        <div class="loading">Loading recipes...</div>
+      </div>
     </div>
+
     <script>
-        // API endpoint - adjust this to your backend API URL
-        const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
-        const AUTH_API_URL = '/api/auth/verify'; // Backend endpoint to verify auth and get user info
-  
-        // Function to check authentication and display user info
-        async function checkAuthAndDisplayUser() {
+      // API endpoints
+      const API_URL = '/api/recipes';
+      const AUTH_API_URL = '/api/auth/verify';
+
+      // Function to check authentication and display user info
+      async function checkAuthAndDisplayUser() {
+        try {
+          // Fixed token retrieval from storage
+          const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+
+          if (!token) {
+            console.log('[auth] No token in storage, attempting cookie-based verify...');
+            // Fallback to cookie-based session verification
             try {
-                // Check if there's a token in localStorage or sessionStorage
-                const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-                
-                if (!token) {
-                    console.log('No auth token found');
-                    return;
-                }
-
-                // Verify token with backend and get user info
-                const response = await fetch(AUTH_API_URL, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.ok) {
-                    const userData = await response.json();
-                    
-                    // Display user's full name if available
-                    if (userData && (userData.name || userData.fullName || userData.displayName)) {
-                        const userName = userData.name || userData.fullName || userData.displayName;
-                        const userInfoDiv = document.getElementById('userInfo');
-                        const userNameSpan = document.getElementById('userName');
-                        
-                        userNameSpan.textContent = userName;
-                        userInfoDiv.classList.add('visible');
-                    }
-                } else {
-                    console.log('Auth verification failed:', response.status);
-                }
-            } catch (error) {
-                console.error('Error checking authentication:', error);
+              const resp = await fetch(AUTH_API_URL, {
+                method: 'GET',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+              });
+              if (resp.ok) {
+                const userData = await resp.json();
+                console.log('[auth] Cookie verify success', userData);
+                maybeShowUser(userData);
+              } else {
+                console.warn('[auth] Cookie verify failed', resp.status);
+              }
+            } catch (e) {
+              console.error('[auth] Cookie verify error', e);
             }
-        }
+            return;
+          }
 
-        // Function to fetch all recipes from the backend
-        async function fetchRecipes() {
-            const container = document.getElementById('recipesContainer');
-            
-            try {
-                const response = await fetch(API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Robust array guard: ensure data is an array
-                let recipes;
-                if (Array.isArray(data)) {
-                    recipes = data;
-                } else if (data && Array.isArray(data.recipes)) {
-                    recipes = data.recipes;
-                } else if (data && typeof data === 'object') {
-                    // If data is an object but not an array, try to extract array
-                    recipes = [];
-                    console.warn('Unexpected data format:', data);
-                } else {
-                    recipes = [];
-                    console.warn('Data is not in expected format:', data);
-                }
-                
-                // Clear loading message
-                container.innerHTML = '';
-                
-                // Check if there are any recipes
-                if (!recipes || recipes.length === 0) {
-                    container.innerHTML = '<div class="no-recipes">No recipes yet. Be the first to add one!</div>';
-                    return;
-                }
-                
-                // Display each recipe as a card
-                recipes.forEach(recipe => {
-                    const card = createRecipeCard(recipe);
-                    container.appendChild(card);
-                });
-                
-            } catch (error) {
-                console.error('Error fetching recipes:', error);
-                
-                let errorMessage = 'Failed to load recipes. Please make sure the backend API is running.';
-                
-                container.innerHTML = `
-                    <div class="error-message">
-                        ${errorMessage}
-                        <br><br>
-                        <small>Error: ${error.message}</small>
-                    </div>
-                `;
+          // Verify bearer token with backend
+          const response = await fetch(AUTH_API_URL, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
             }
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            console.log('[auth] Token verify success', userData);
+            maybeShowUser(userData);
+          } else {
+            console.warn('[auth] Token verify failed', response.status);
+          }
+        } catch (error) {
+          console.error('[auth] Error checking authentication', error);
         }
-        
-        // Function to create a recipe card element
-        function createRecipeCard(recipe) {
-            const card = document.createElement('a');
-            card.className = 'recipe-card';
-            card.href = `/view-recipe.html?id=${recipe.id}`;
-            
-            // Get recipe title - support both recipeName and title fields
-            const recipeTitle = recipe.recipeName || recipe.title || recipe.name || 'Untitled Recipe';
-            
-            // Create image or placeholder
-            let imageHTML;
-            if (recipe.imageUrl) {
-                imageHTML = `<img src="${recipe.imageUrl}" alt="${recipeTitle}" class="recipe-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="recipe-image-placeholder" style="display: none;">🍽️</div>`;
-            } else {
-                imageHTML = '<div class="recipe-image-placeholder">🍽️</div>';
-            }
-            
-            // Build card HTML
-            card.innerHTML = `
-                ${imageHTML}
-                <div class="recipe-content">
-                    <div class="recipe-title">${recipeTitle}</div>
-                    <div class="recipe-category">${recipe.category || 'Uncategorized'}</div>
-                    ${recipe.description ? `<p style="color: #666; font-size: 14px; margin-top: 10px;">${recipe.description.substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>` : ''}
-                    <div class="recipe-meta">
-                        ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime} min</span>` : ''}
-                        ${recipe.servings ? `<span>👥 ${recipe.servings} servings</span>` : ''}
-                        ${recipe.difficulty ? `<span>📊 ${recipe.difficulty}</span>` : ''}
-                    </div>
-                </div>
-            `;
-            
-            return card;
+      }
+
+      function maybeShowUser(userData) {
+        if (!userData) return;
+        const name = userData.name || userData.fullName || userData.displayName || userData.email;
+        if (!name) return;
+        const userInfoDiv = document.getElementById('userInfo');
+        const userNameSpan = document.getElementById('userName');
+        userNameSpan.textContent = name;
+        userInfoDiv.classList.add('visible');
+      }
+
+      // Fetch all recipes
+      async function fetchRecipes() {
+        const container = document.getElementById('recipesContainer');
+        try {
+          const response = await fetch(API_URL);
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+          let recipes;
+          if (Array.isArray(data)) {
+            recipes = data;
+          } else if (data && Array.isArray(data.recipes)) {
+            recipes = data.recipes;
+          } else if (data && typeof data === 'object') {
+            recipes = [];
+            console.warn('Unexpected data format:', data);
+          } else {
+            recipes = [];
+            console.warn('Data is not in expected format:', data);
+          }
+          container.innerHTML = '';
+          if (!recipes || recipes.length === 0) {
+            container.innerHTML = '<div class="no-recipes">No recipes yet. Be the first to add one!</div>';
+            return;
+          }
+          recipes.forEach((recipe) => {
+            const card = createRecipeCard(recipe);
+            container.appendChild(card);
+          });
+        } catch (error) {
+          console.error('Error fetching recipes:', error);
+          container.innerHTML = `
+            <div class="error-message">
+              Failed to load recipes. Please make sure the backend API is running.
+              <br /><br />
+              <small>Error: ${error.message}</small>
+            </div>
+          `;
         }
-        
-        // Load recipes and check auth when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuthAndDisplayUser();
-            fetchRecipes();
-        });
+      }
+
+      function createRecipeCard(recipe) {
+        const card = document.createElement('a');
+        card.className = 'recipe-card';
+        card.href = `/view-recipe.html?id=${recipe.id}`;
+        const recipeTitle = recipe.recipeName || recipe.title || recipe.name || 'Untitled Recipe';
+        let imageHTML;
+        if (recipe.imageUrl) {
+          imageHTML = `<img src="${recipe.imageUrl}" alt="${recipeTitle}" class="recipe-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"/>
+                       <div class="recipe-image-placeholder" style="display: none;">🍽️</div>`;
+        } else {
+          imageHTML = '<div class="recipe-image-placeholder">🍽️</div>';
+        }
+        card.innerHTML = `
+          ${imageHTML}
+          <div class="recipe-content">
+            <div class="recipe-title">${recipeTitle}</div>
+            <div class="recipe-category">${recipe.category || 'Uncategorized'}</div>
+            ${recipe.description ? `<p style="color: #666; font-size: 14px; margin-top: 10px;">${recipe.description.substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>` : ''}
+            <div class="recipe-meta">
+              ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime} min</span>` : ''}
+              ${recipe.servings ? `<span>👥 ${recipe.servings} servings</span>` : ''}
+              ${recipe.difficulty ? `<span>📊 ${recipe.difficulty}</span>` : ''}
+            </div>
+          </div>
+        `;
+        return card;
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        checkAuthAndDisplayUser();
+        fetchRecipes();
+      });
     </script>
-</body>
+  </body>
 </html>
