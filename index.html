@@ -43,7 +43,6 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        /* Authentication disabled - keeping styles for future use */
         .google-button {
             background: #4285f4;
             color: white;
@@ -65,14 +64,9 @@
 <body>
     <div class="login-container">
         <h1>Welcome to Recipes</h1>
-        <p>Access is now open to everyone!</p>
-        <a href="/home.html" class="button primary-button">View Recipes</a>
-        <a href="/add-recipe.html" class="button secondary-button">Add a Recipe</a>
-        
-        <!-- Authentication temporarily disabled - uncomment below to re-enable -->
-        <!-- <a href="/add-recipe.html" class="button google-button">Sign in with Google</a> -->
-        <!-- Guest mode temporarily disabled - uncomment below to re-enable -->
-        <!-- <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a> -->
+        <p>Choose how you'd like to access the recipes:</p>
+        <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a>
+        <a href="/add-recipe.html" class="button google-button">Sign in with Google</a>
     </div>
 </body>
 </html>
