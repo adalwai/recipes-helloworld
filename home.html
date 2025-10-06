@@ -52,23 +52,6 @@
         .add-recipe-link:hover {
             background-color: #45a049;
         }
-        .auth-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: white;
-            color: #4CAF50;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background-color 0.3s;
-            border: 2px solid white;
-        }
-        .auth-button:hover {
-            background-color: #f0f0f0;
-        }
         .recipes-section {
             margin-top: 40px;
         }
@@ -157,66 +140,16 @@
 <body>
     <header>
         <h1>🍽️ Recipe Collection</h1>
-        <a href="#" id="authButton" class="auth-button" style="display: none;"></a>
     </header>
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
-    <a href="add-recipe.html" id="addRecipeButton" class="add-recipe-link">+ Add Recipe</a>
+    <a href="add-recipe.html" class="add-recipe-link" id="addRecipeButton">+ Add Recipe</a>
     <div class="recipes-section">
         <h2>All Recipes</h2>
-        <div id="recipesContainer" class="recipes-container">
+        <div class="recipes-container" id="recipesContainer">
             <div class="loading">Loading recipes...</div>
         </div>
     </div>
     <script>
-        // GUEST MODE DISABLED - redirect guests to login
-        // Check if user is a guest by looking for ?guest=true in URL
-        function checkGuestStatus() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isGuest = urlParams.get('guest') === 'true';
-            
-            // Guest mode is disabled - redirect to login page
-            if (isGuest) {
-                window.location.href = '/index.html';
-                return;
-            }
-            
-            /* GUEST MODE CODE - Preserved for future re-enablement
-            const addRecipeButton = document.getElementById('addRecipeButton');
-            const authButton = document.getElementById('authButton');
-            
-            if (isGuest) {
-                // Hide the Add Recipe button for guests
-                addRecipeButton.style.display = 'none';
-                // Show Log In button for guests
-                authButton.textContent = 'Log In';
-                authButton.href = '/index.html';
-                authButton.style.display = 'block';
-            } else {
-            */
-                // Show the Add Recipe button for authenticated users
-                const addRecipeButton = document.getElementById('addRecipeButton');
-                const authButton = document.getElementById('authButton');
-                addRecipeButton.style.display = 'block';
-                // Show Log Off button for authenticated users
-                authButton.textContent = 'Log Off';
-                authButton.href = '#';
-                authButton.onclick = function(e) {
-                    e.preventDefault();
-                    // First logout from Cloudflare Access
-                    fetch('/cdn-cgi/access/logout', { method: 'GET' })
-                        .then(() => {
-                            // Then redirect to index.html
-                            window.location.href = '/index.html';
-                        })
-                        .catch(() => {
-                            // Even if logout fails, redirect anyway
-                            window.location.href = '/index.html';
-                        });
-                };
-                authButton.style.display = 'block';
-            /* } // End guest mode code */
-        }
-        
         // API endpoint - adjust this to your backend API URL
         const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
   
@@ -314,9 +247,8 @@
             return card;
         }
         
-        // Load recipes and check guest status when page loads
+        // Load recipes when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            checkGuestStatus();
             fetchRecipes();
         });
     </script>
