@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome - Recipes</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,21 +44,12 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        .google-button {
-            background: #4285f4;
-            color: white;
-        }
         .guest-button {
             background: #f1f3f4;
             color: #333;
         }
-        .primary-button {
-            background: #28a745;
-            color: white;
-        }
-        .secondary-button {
-            background: #6c757d;
-            color: white;
+        #googleSignInButton {
+            margin: 15px auto;
         }
     </style>
 </head>
@@ -65,8 +57,46 @@
     <div class="login-container">
         <h1>Welcome to Recipes</h1>
         <p>Choose how you'd like to access the recipes:</p>
-        <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a>
-        <a href="/add-recipe.html" class="button google-button">Sign in with Google</a>
+        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
+        <div id="googleSignInButton"></div>
     </div>
+
+    <script>
+        function handleGoogleSignIn(response) {
+            // Send the credential token to backend for verification
+            fetch('/api/verify-google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Store user info and redirect to home
+                    sessionStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = '/home.html';
+                } else {
+                    alert('Authentication failed: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during sign-in');
+            });
+        }
+
+        window.onload = function() {
+            google.accounts.id.initialize({
+                client_id: '184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com',
+                callback: handleGoogleSignIn
+            });
+            google.accounts.id.renderButton(
+                document.getElementById('googleSignInButton'),
+                { theme: 'outline', size: 'large', width: '100%' }
+            );
+        };
+    </script>
 </body>
 </html>
