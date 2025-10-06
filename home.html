@@ -156,16 +156,31 @@
     </header>
     
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
-    <a href="add-recipe.html" class="add-recipe-link">+ Add Recipe</a>
+    <a class="add-recipe-link" href="add-recipe.html" id="addRecipeButton">+ Add Recipe</a>
     
     <div class="recipes-section">
         <h2>All Recipes</h2>
-        <div id="recipesContainer" class="recipes-container">
+        <div class="recipes-container" id="recipesContainer">
             <div class="loading">Loading recipes...</div>
         </div>
     </div>
     
     <script>
+        // Check if user is a guest by looking for ?guest=true in URL
+        function checkGuestStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isGuest = urlParams.get('guest') === 'true';
+            
+            const addRecipeButton = document.getElementById('addRecipeButton');
+            if (isGuest) {
+                // Hide the Add Recipe button for guests
+                addRecipeButton.style.display = 'none';
+            } else {
+                // Show the Add Recipe button for authenticated users
+                addRecipeButton.style.display = 'block';
+            }
+        }
+        
         // API endpoint - adjust this to your backend API URL
         const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
         
@@ -247,8 +262,11 @@
             return card;
         }
         
-        // Load recipes when page loads
-        document.addEventListener('DOMContentLoaded', fetchRecipes);
+        // Load recipes and check guest status when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkGuestStatus();
+            fetchRecipes();
+        });
     </script>
 </body>
 </html>
