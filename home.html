@@ -171,61 +171,7 @@
     <script>
       // API endpoints
       const API_URL = '/api/recipes';
-      const AUTH_API_URL = '/api/auth/verify';
-      // Function to check authentication and display user info
-      async function checkAuthAndDisplayUser() {
-        try {
-          // Fixed token retrieval from storage
-          const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-          if (!token) {
-            console.log('[auth] No token in storage, attempting cookie-based verify...');
-            // Fallback to cookie-based session verification
-            try {
-              const resp = await fetch(AUTH_API_URL, {
-                method: 'GET',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' }
-              });
-              if (resp.ok) {
-                const userData = await resp.json();
-                console.log('[auth] Cookie verify success', userData);
-                maybeShowUser(userData);
-              } else {
-                console.warn('[auth] Cookie verify failed', resp.status);
-              }
-            } catch (e) {
-              console.error('[auth] Cookie verify error', e);
-            }
-            return;
-          }
-          // Verify bearer token with backend
-          const response = await fetch(AUTH_API_URL, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (response.ok) {
-            const userData = await response.json();
-            console.log('[auth] Token verify success', userData);
-            maybeShowUser(userData);
-          } else {
-            console.warn('[auth] Token verify failed', response.status);
-          }
-        } catch (error) {
-          console.error('[auth] Error checking authentication', error);
-        }
-      }
-      function maybeShowUser(userData) {
-        if (!userData) return;
-        const name = userData.name || userData.fullName || userData.displayName || userData.email;
-        if (!name) return;
-        const userInfoDiv = document.getElementById('userInfo');
-        const userNameSpan = document.getElementById('userName');
-        userNameSpan.textContent = name;
-        userInfoDiv.classList.add('visible');
-      }
+
       // Fetch all recipes
       async function fetchRecipes() {
         const container = document.getElementById('recipesContainer');
@@ -293,11 +239,13 @@
         return card;
       }
       document.addEventListener('DOMContentLoaded', function () {
-        checkAuthAndDisplayUser();
         fetchRecipes();
       });
     </script>
+    <!-- Unified header auth script -->
     <script src="/functions/api/header.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', initHeaderAuth);</script>
+    <script>
+      document.addEventListener('DOMContentLoaded', initHeaderAuth);
+    </script>
   </body>
 </html>
