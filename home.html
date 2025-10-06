@@ -24,6 +24,7 @@
             text-align: center;
             border-radius: 5px;
             margin-bottom: 30px;
+            position: relative;
         }
         h1 {
             font-size: 32px;
@@ -51,6 +52,23 @@
         .add-recipe-link:hover {
             background-color: #45a049;
         }
+        .auth-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: white;
+            color: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            border: 2px solid white;
+        }
+        .auth-button:hover {
+            background-color: #f0f0f0;
+        }
         .recipes-section {
             margin-top: 40px;
         }
@@ -64,28 +82,26 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
         }
         .recipe-card {
-            background-color: white;
+            background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.2s, box-shadow 0.2s;
             cursor: pointer;
             text-decoration: none;
             color: inherit;
             display: block;
         }
         .recipe-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         .recipe-image {
             width: 100%;
             height: 200px;
             object-fit: cover;
-            background-color: #e0e0e0;
         }
         .recipe-image-placeholder {
             width: 100%;
@@ -94,8 +110,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 48px;
+            font-size: 64px;
         }
         .recipe-content {
             padding: 20px;
@@ -104,29 +119,19 @@
             font-size: 20px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .recipe-category {
-            display: inline-block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            text-transform: capitalize;
+            color: #4CAF50;
+            font-size: 14px;
+            margin-bottom: 12px;
         }
         .recipe-meta {
             display: flex;
             gap: 15px;
-            margin-top: 10px;
+            margin-top: 12px;
             color: #666;
             font-size: 14px;
-        }
-        .recipe-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
         .loading {
             text-align: center;
@@ -135,17 +140,16 @@
             font-size: 18px;
         }
         .error-message {
-            text-align: center;
+            background-color: #ffebee;
+            color: #c62828;
             padding: 20px;
-            background-color: #f44336;
-            color: white;
             border-radius: 5px;
-            margin: 20px 0;
+            text-align: center;
         }
         .no-recipes {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 60px 20px;
+            color: #999;
             font-size: 18px;
         }
     </style>
@@ -153,18 +157,19 @@
 <body>
     <header>
         <h1>🍽️ Recipe Collection</h1>
+        <a href="#" class="auth-button" id="authButton" style="display: none;"></a>
     </header>
-    
+
     <p class="welcome-message">Welcome to our Recipe Collection! Share your favorite recipes with the community.</p>
     <a class="add-recipe-link" href="add-recipe.html" id="addRecipeButton">+ Add Recipe</a>
-    
+
     <div class="recipes-section">
         <h2>All Recipes</h2>
         <div class="recipes-container" id="recipesContainer">
             <div class="loading">Loading recipes...</div>
         </div>
     </div>
-    
+
     <script>
         // Check if user is a guest by looking for ?guest=true in URL
         function checkGuestStatus() {
@@ -172,19 +177,42 @@
             const isGuest = urlParams.get('guest') === 'true';
             
             const addRecipeButton = document.getElementById('addRecipeButton');
+            const authButton = document.getElementById('authButton');
+            
             if (isGuest) {
                 // Hide the Add Recipe button for guests
                 addRecipeButton.style.display = 'none';
+                // Show Log In button for guests
+                authButton.textContent = 'Log In';
+                authButton.href = '/index.html';
+                authButton.style.display = 'block';
             } else {
                 // Show the Add Recipe button for authenticated users
                 addRecipeButton.style.display = 'block';
+                // Show Log Off button for authenticated users
+                authButton.textContent = 'Log Off';
+                authButton.href = '#';
+                authButton.onclick = function(e) {
+                    e.preventDefault();
+                    // First logout from Cloudflare Access
+                    fetch('/cdn-cgi/access/logout', { method: 'GET' })
+                        .then(() => {
+                            // Then redirect to index.html
+                            window.location.href = '/index.html';
+                        })
+                        .catch(() => {
+                            // Even if logout fails, redirect anyway
+                            window.location.href = '/index.html';
+                        });
+                };
+                authButton.style.display = 'block';
             }
         }
         
         // API endpoint - adjust this to your backend API URL
         const API_URL = '/api/recipes'; // Uses relative path for Cloudflare Pages and static deployments
-        
-        // Function to fetch recipes from the backend
+  
+        // Function to fetch all recipes from the backend
         async function fetchRecipes() {
             const container = document.getElementById('recipesContainer');
             
@@ -192,18 +220,16 @@
                 const response = await fetch(API_URL);
                 
                 if (!response.ok) {
-                    throw new Error('Failed to fetch recipes');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const data = await response.json();
-                
-                // Extract recipes array from the response object
-                const recipes = data.recipes || [];
+                const recipes = await response.json();
                 
                 // Clear loading message
                 container.innerHTML = '';
                 
-                if (recipes.length === 0) {
+                // Check if there are any recipes
+                if (!recipes || recipes.length === 0) {
                     container.innerHTML = '<div class="no-recipes">No recipes yet. Be the first to add one!</div>';
                     return;
                 }
