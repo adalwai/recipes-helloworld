@@ -59,6 +59,30 @@
             text-align: center;
             color: #666;
         }
+        #statusMessage {
+            display: none;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+        #statusMessage.loading {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #90caf9;
+        }
+        #statusMessage.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #81c784;
+        }
+        #statusMessage.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
     </style>
 </head>
 <body>
@@ -67,16 +91,19 @@
         <p>Choose how you'd like to access the recipes:</p>
         
         <!-- Google Sign-In using Google Identity Services -->
-        <div id="g_id_onload" 
+        <div id="g_id_onload"
              data-client_id="184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com"
              data-callback="handleGoogleSignIn"
              data-auto_prompt="false">
         </div>
         <div id="googleSignInButton"></div>
         
+        <!-- Status Message -->
+        <div id="statusMessage" role="status" aria-live="polite"></div>
+        
         <div class="divider">or</div>
         
-        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
+        <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a>
     </div>
     
     <script>
@@ -89,6 +116,12 @@
                 console.log('[index.html] Credential received:', response.credential ? 'YES' : 'NO');
                 console.log('[index.html] Credential length:', response.credential ? response.credential.length : 0);
                 console.log('[index.html] Credential (first 50 chars):', response.credential ? response.credential.substring(0, 50) + '...' : 'N/A');
+                
+                // Show loading indicator
+                const statusDiv = document.getElementById('statusMessage');
+                statusDiv.textContent = 'Verifying credentials...';
+                statusDiv.className = 'loading';
+                statusDiv.style.display = 'block';
                 
                 // Send the credential token to backend for verification
                 console.log('[index.html] Sending credential to /api/verify-google');
@@ -113,28 +146,41 @@
                         console.log('[index.html] User email:', data.user.email);
                         console.log('[index.html] User name:', data.user.name);
                         
+                        // Show success message
+                        statusDiv.textContent = 'Success! Redirecting...';
+                        statusDiv.className = 'success';
+                        
                         // Store user info and token in sessionStorage
                         sessionStorage.setItem('user', JSON.stringify(data.user));
                         sessionStorage.setItem('authToken', response.credential);
                         console.log('[index.html] User data stored in sessionStorage');
                         
-                        // Redirect to home
+                        // Redirect to home after brief delay
                         console.log('[index.html] Redirecting to /home.html');
-                        window.location.href = '/home.html';
+                        setTimeout(() => {
+                            window.location.href = '/home.html';
+                        }, 500);
                     } else {
                         console.error('[index.html] Authentication failed:', data.error);
-                        alert('Authentication failed: ' + data.error);
+                        statusDiv.textContent = 'Authentication failed: ' + data.error;
+                        statusDiv.className = 'error';
                     }
                 })
                 .catch(error => {
                     console.error('[index.html] EXCEPTION during sign-in:', error.name);
                     console.error('[index.html] Error message:', error.message);
                     console.error('[index.html] Error stack:', error.stack);
-                    alert('An error occurred during sign-in. Check console for details.');
+                    statusDiv.textContent = 'An error occurred during sign-in. Please try again.';
+                    statusDiv.className = 'error';
                 });
             } catch (error) {
                 console.error('[index.html] ERROR in handleGoogleSignIn:', error);
-                alert('Sign-in failed: ' + error.message + '. Please try again or use Guest mode.');
+                const statusDiv = document.getElementById('statusMessage');
+                if (statusDiv) {
+                    statusDiv.textContent = 'Sign-in failed: ' + error.message + '. Please try again or use Guest mode.';
+                    statusDiv.className = 'error';
+                    statusDiv.style.display = 'block';
+                }
             }
         }
         
