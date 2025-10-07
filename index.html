@@ -76,7 +76,7 @@
         
         <div class="divider">or</div>
         
-        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
+        <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a>
     </div>
     
     <script>
@@ -84,53 +84,58 @@
         
         // Handle Google Sign-In response
         function handleGoogleSignIn(response) {
-            console.log('[index.html] Google Sign-In callback triggered');
-            console.log('[index.html] Credential received:', response.credential ? 'YES' : 'NO');
-            console.log('[index.html] Credential length:', response.credential ? response.credential.length : 0);
-            console.log('[index.html] Credential (first 50 chars):', response.credential ? response.credential.substring(0, 50) + '...' : 'N/A');
-            
-            // Send the credential token to backend for verification
-            console.log('[index.html] Sending credential to /api/verify-google');
-            
-            fetch('/api/verify-google', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: response.credential })
-            })
-            .then(res => {
-                console.log('[index.html] Response status:', res.status);
-                console.log('[index.html] Response statusText:', res.statusText);
-                return res.json();
-            })
-            .then(data => {
-                console.log('[index.html] Response data:', JSON.stringify(data, null, 2));
+            try {
+                console.log('[index.html] Google Sign-In callback triggered');
+                console.log('[index.html] Credential received:', response.credential ? 'YES' : 'NO');
+                console.log('[index.html] Credential length:', response.credential ? response.credential.length : 0);
+                console.log('[index.html] Credential (first 50 chars):', response.credential ? response.credential.substring(0, 50) + '...' : 'N/A');
                 
-                if (data.success) {
-                    console.log('[index.html] Authentication successful!');
-                    console.log('[index.html] User email:', data.user.email);
-                    console.log('[index.html] User name:', data.user.name);
+                // Send the credential token to backend for verification
+                console.log('[index.html] Sending credential to /api/verify-google');
+                
+                fetch('/api/verify-google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token: response.credential })
+                })
+                .then(res => {
+                    console.log('[index.html] Response status:', res.status);
+                    console.log('[index.html] Response statusText:', res.statusText);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('[index.html] Response data:', JSON.stringify(data, null, 2));
                     
-                    // Store user info and token in sessionStorage
-                    sessionStorage.setItem('user', JSON.stringify(data.user));
-                    sessionStorage.setItem('authToken', response.credential);
-                    console.log('[index.html] User data stored in sessionStorage');
-                    
-                    // Redirect to home
-                    console.log('[index.html] Redirecting to /home.html');
-                    window.location.href = '/home.html';
-                } else {
-                    console.error('[index.html] Authentication failed:', data.error);
-                    alert('Authentication failed: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('[index.html] EXCEPTION during sign-in:', error.name);
-                console.error('[index.html] Error message:', error.message);
-                console.error('[index.html] Error stack:', error.stack);
-                alert('An error occurred during sign-in. Check console for details.');
-            });
+                    if (data.success) {
+                        console.log('[index.html] Authentication successful!');
+                        console.log('[index.html] User email:', data.user.email);
+                        console.log('[index.html] User name:', data.user.name);
+                        
+                        // Store user info and token in sessionStorage
+                        sessionStorage.setItem('user', JSON.stringify(data.user));
+                        sessionStorage.setItem('authToken', response.credential);
+                        console.log('[index.html] User data stored in sessionStorage');
+                        
+                        // Redirect to home
+                        console.log('[index.html] Redirecting to /home.html');
+                        window.location.href = '/home.html';
+                    } else {
+                        console.error('[index.html] Authentication failed:', data.error);
+                        alert('Authentication failed: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('[index.html] EXCEPTION during sign-in:', error.name);
+                    console.error('[index.html] Error message:', error.message);
+                    console.error('[index.html] Error stack:', error.stack);
+                    alert('An error occurred during sign-in. Check console for details.');
+                });
+            } catch (error) {
+                console.error('[index.html] ERROR in handleGoogleSignIn:', error);
+                alert('Sign-in failed: ' + error.message + '. Please try again or use Guest mode.');
+            }
         }
         
         // Initialize Google Identity Services when library is loaded
