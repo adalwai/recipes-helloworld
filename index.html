@@ -153,7 +153,9 @@
                         // Store user info and token in sessionStorage
                         sessionStorage.setItem('user', JSON.stringify(data.user));
                         sessionStorage.setItem('authToken', response.credential);
-                        console.log('[index.html] User data stored in sessionStorage');
+                        // Also set as cookie for backend compatibility
+                        document.cookie = 'google_token=' + response.credential + ';path=/;SameSite=Lax';
+                        console.log('[index.html] User data stored in sessionStorage and cookie');
                         
                         // Redirect to home after brief delay
                         console.log('[index.html] Redirecting to /home.html');
