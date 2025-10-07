@@ -9,7 +9,9 @@
  * - Uses single /api/me endpoint for all authentication modes
  * - Robust logging and error handling
  */
+
 const AUTH_ME_ENDPOINT = '/api/me';
+
 /**
  * Initialize header authentication status display
  * Call this function on DOMContentLoaded from your page
@@ -36,6 +38,7 @@ async function initHeaderAuth() {
     showUnauthenticatedState();
   }
 }
+
 /**
  * Verify authentication using Bearer token or cookie-based session
  * Returns user profile {name, email, picture} or null if unauthenticated
@@ -62,55 +65,56 @@ async function verifyAuth() {
         console.log('[header.js] Bearer auth successful:', userData);
         return userData;
       } else {
+        // Log the response body as text before parsing
+        const responseText = await response.text();
         console.warn('[header.js] Bearer auth failed with status:', response.status);
+        console.warn('[header.js] Bearer auth failed - Response body:', responseText);
       }
     } catch (error) {
-      console.error('[header.js] Bearer auth request error:', error);
+      console.error('[header.js] Error during Bearer auth:', error);
     }
-  } else {
-    console.log('[header.js] No token in storage');
   }
   
-  // Fallback to cookie-based session authentication
-  console.log('[header.js] Attempting cookie-based auth...');
+  // Fallback: try cookie-based session
+  console.log('[header.js] No token found or Bearer auth failed, trying cookie-based session...');
   try {
     const response = await fetch(AUTH_ME_ENDPOINT, {
       method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      credentials: 'include'
     });
     
     if (response.ok) {
       const userData = await response.json();
-      console.log('[header.js] Cookie auth successful:', userData);
+      console.log('[header.js] Cookie-based session auth successful:', userData);
       return userData;
     } else {
-      console.warn('[header.js] Cookie auth failed with status:', response.status);
+      console.warn('[header.js] Cookie-based session auth failed with status:', response.status);
     }
   } catch (error) {
-    console.error('[header.js] Cookie auth request error:', error);
+    console.error('[header.js] Error during cookie-based auth:', error);
   }
   
+  console.log('[header.js] All authentication methods failed');
   return null;
 }
+
 /**
- * Show "Checking..." state in the header
+ * Show checking state while auth is being verified
  */
 function showCheckingState() {
   const userInfo = document.getElementById('userInfo');
   const userName = document.getElementById('userName');
   
   if (userInfo && userName) {
-    userName.textContent = 'Checking…';
+    userName.textContent = 'Checking...';
     userInfo.classList.add('visible');
-    userInfo.style.opacity = '0.7';
+    userInfo.style.opacity = '0.6';
     console.log('[header.js] Showing checking state');
   } else {
     console.warn('[header.js] Could not find #userInfo or #userName elements');
   }
 }
+
 /**
  * Show authenticated user information in the header
  */
@@ -146,6 +150,7 @@ function showUserInfo(userData) {
   userInfo.classList.add('visible');
   userInfo.style.opacity = '1';
 }
+
 /**
  * Show unauthenticated state (hide user info or show login prompt)
  */
@@ -167,6 +172,7 @@ function showUnauthenticatedState() {
     console.warn('[header.js] Could not find #userInfo or #userName elements');
   }
 }
+
 // Export for use in pages
 if (typeof window !== 'undefined') {
   window.initHeaderAuth = initHeaderAuth;
