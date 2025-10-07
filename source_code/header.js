@@ -6,7 +6,7 @@
  * - Shows "Checking..." state immediately while verification is in progress
  * - Attempts Bearer token authentication first (from localStorage/sessionStorage)
  * - Falls back to cookie-based session authentication
- * - Uses single /api/auth/me endpoint for all authentication modes
+ * - Uses single /api/me endpoint for all authentication modes
  * - Robust logging and error handling
  */
 const AUTH_ME_ENDPOINT = '/api/me';
