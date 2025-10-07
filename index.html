@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome - Recipes</title>
     <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src='https://accounts.google.com/gsi/client' async defer></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -67,7 +67,7 @@
         <p>Choose how you'd like to access the recipes:</p>
         
         <!-- Google Sign-In using Google Identity Services -->
-        <div id="g_id_onload"
+        <div id="g_id_onload" 
              data-client_id="184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com"
              data-callback="handleGoogleSignIn"
              data-auto_prompt="false">
@@ -76,7 +76,7 @@
         
         <div class="divider">or</div>
         
-        <a href="/home.html?guest=true" class="button guest-button">Continue as Guest</a>
+        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
     </div>
     
     <script>
@@ -140,44 +140,90 @@
         
         // Initialize Google Identity Services when library is loaded
         window.onload = function() {
-            console.log('[index.html] window.onload triggered');
-            
-            if (typeof google !== 'undefined' && google.accounts) {
-                console.log('[index.html] Google Identity Services library loaded');
+            try {
+                console.log('[index.html] window.onload triggered');
                 
-                try {
-                    // Initialize the button
-                    google.accounts.id.initialize({
-                        client_id: '184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com',
-                        callback: handleGoogleSignIn
-                    });
-                    console.log('[index.html] Google Sign-In initialized');
+                // Check if Google Identity Services is available
+                if (typeof google === 'undefined') {
+                    console.warn('[index.html] Google object not found, waiting for library to load...');
                     
-                    // Render the sign-in button
+                    // Retry initialization after delay
+                    setTimeout(function() {
+                        try {
+                            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                                console.log('[index.html] Google Identity Services library loaded after delay');
+                                initializeGoogleSignIn();
+                            } else {
+                                console.error('[index.html] Google Identity Services library failed to load after delay');
+                                displayFallbackMessage();
+                            }
+                        } catch (retryError) {
+                            console.error('[index.html] Error during retry initialization:', retryError);
+                            displayFallbackMessage();
+                        }
+                    }, 2000);
+                    return;
+                }
+                
+                if (!google.accounts || !google.accounts.id) {
+                    console.error('[index.html] Google Identity Services API not available');
+                    displayFallbackMessage();
+                    return;
+                }
+                
+                console.log('[index.html] Google Identity Services library loaded successfully');
+                initializeGoogleSignIn();
+                
+            } catch (error) {
+                console.error('[index.html] Error in window.onload:', error);
+                displayFallbackMessage();
+            }
+        };
+        
+        function initializeGoogleSignIn() {
+            try {
+                console.log('[index.html] Initializing Google Sign-In...');
+                
+                // Initialize the Google Sign-In
+                google.accounts.id.initialize({
+                    client_id: '184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com',
+                    callback: handleGoogleSignIn,
+                    auto_select: false,
+                    cancel_on_tap_outside: true
+                });
+                console.log('[index.html] Google Sign-In initialized successfully');
+                
+                // Render the sign-in button
+                const buttonContainer = document.getElementById('googleSignInButton');
+                if (buttonContainer) {
                     google.accounts.id.renderButton(
-                        document.getElementById('googleSignInButton'),
+                        buttonContainer,
                         { 
                             theme: 'outline', 
                             size: 'large',
                             width: 300,
-                            text: 'signin_with'
+                            text: 'signin_with',
+                            shape: 'rectangular'
                         }
                     );
-                    console.log('[index.html] Google Sign-In button rendered');
-                } catch (error) {
-                    console.error('[index.html] Error initializing Google Sign-In:', error.message);
-                    console.error('[index.html] Error stack:', error.stack);
+                    console.log('[index.html] Google Sign-In button rendered successfully');
+                } else {
+                    console.error('[index.html] Button container not found');
                 }
-            } else {
-                console.error('[index.html] Google Identity Services library not loaded!');
-                setTimeout(function() {
-                    if (typeof google !== 'undefined' && google.accounts) {
-                        console.log('[index.html] Google library loaded after delay, retrying...');
-                        window.onload();
-                    }
-                }, 1000);
+                
+            } catch (error) {
+                console.error('[index.html] Error initializing Google Sign-In:', error);
+                displayFallbackMessage();
             }
-        };
+        }
+        
+        function displayFallbackMessage() {
+            console.log('[index.html] Displaying fallback message');
+            const buttonContainer = document.getElementById('googleSignInButton');
+            if (buttonContainer) {
+                buttonContainer.innerHTML = '<p style="color: #666; font-size: 14px;">Google Sign-In temporarily unavailable.<br/>Please use Guest mode to continue.</p>';
+            }
+        }
     </script>
 </body>
 </html>
