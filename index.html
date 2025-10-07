@@ -136,7 +136,25 @@
                 .then(res => {
                     console.log('[index.html] Response status:', res.status);
                     console.log('[index.html] Response statusText:', res.statusText);
-                    return res.json();
+                    
+                    // Check Content-Type before parsing as JSON
+                    const contentType = res.headers.get('content-type');
+                    console.log('[index.html] Response Content-Type:', contentType);
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        console.log('[index.html] Content-Type is JSON, parsing as JSON');
+                        return res.json();
+                    } else {
+                        console.error('[index.html] ERROR: Response is not JSON!');
+                        console.error('[index.html] Content-Type received:', contentType);
+                        console.error('[index.html] Status:', res.status);
+                        
+                        // Return text for debugging
+                        return res.text().then(text => {
+                            console.error('[index.html] Response text (first 200 chars):', text.substring(0, 200));
+                            throw new Error('Server returned non-JSON response (Content-Type: ' + contentType + '). Expected application/json.');
+                        });
+                    }
                 })
                 .then(data => {
                     console.log('[index.html] Response data:', JSON.stringify(data, null, 2));
