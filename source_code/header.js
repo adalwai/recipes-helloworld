@@ -9,9 +9,7 @@
  * - Uses single /api/auth/me endpoint for all authentication modes
  * - Robust logging and error handling
  */
-
-const AUTH_ME_ENDPOINT = '/api/auth/me';
-
+const AUTH_ME_ENDPOINT = '/api/me';
 /**
  * Initialize header authentication status display
  * Call this function on DOMContentLoaded from your page
@@ -38,7 +36,6 @@ async function initHeaderAuth() {
     showUnauthenticatedState();
   }
 }
-
 /**
  * Verify authentication using Bearer token or cookie-based session
  * Returns user profile {name, email, picture} or null if unauthenticated
@@ -98,7 +95,6 @@ async function verifyAuth() {
   
   return null;
 }
-
 /**
  * Show "Checking..." state in the header
  */
@@ -115,7 +111,6 @@ function showCheckingState() {
     console.warn('[header.js] Could not find #userInfo or #userName elements');
   }
 }
-
 /**
  * Show authenticated user information in the header
  */
@@ -151,7 +146,6 @@ function showUserInfo(userData) {
   userInfo.classList.add('visible');
   userInfo.style.opacity = '1';
 }
-
 /**
  * Show unauthenticated state (hide user info or show login prompt)
  */
@@ -173,7 +167,6 @@ function showUnauthenticatedState() {
     console.warn('[header.js] Could not find #userInfo or #userName elements');
   }
 }
-
 // Export for use in pages
 if (typeof window !== 'undefined') {
   window.initHeaderAuth = initHeaderAuth;
