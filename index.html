@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome - Recipes</title>
+    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         body {
@@ -50,6 +51,13 @@
         }
         #googleSignInButton {
             margin: 15px auto;
+            display: flex;
+            justify-content: center;
+        }
+        .divider {
+            margin: 20px 0;
+            text-align: center;
+            color: #666;
         }
     </style>
 </head>
@@ -57,13 +65,33 @@
     <div class="login-container">
         <h1>Welcome to Recipes</h1>
         <p>Choose how you'd like to access the recipes:</p>
-        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
+        
+        <!-- Google Sign-In using Google Identity Services -->
+        <div id="g_id_onload"
+             data-client_id="184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com"
+             data-callback="handleGoogleSignIn"
+             data-auto_prompt="false">
+        </div>
         <div id="googleSignInButton"></div>
+        
+        <div class="divider">or</div>
+        
+        <a class="button guest-button" href="/home.html?guest=true">Continue as Guest</a>
     </div>
-
+    
     <script>
+        console.log('[index.html] Page loaded, initializing Google Sign-In');
+        
+        // Handle Google Sign-In response
         function handleGoogleSignIn(response) {
+            console.log('[index.html] Google Sign-In callback triggered');
+            console.log('[index.html] Credential received:', response.credential ? 'YES' : 'NO');
+            console.log('[index.html] Credential length:', response.credential ? response.credential.length : 0);
+            console.log('[index.html] Credential (first 50 chars):', response.credential ? response.credential.substring(0, 50) + '...' : 'N/A');
+            
             // Send the credential token to backend for verification
+            console.log('[index.html] Sending credential to /api/verify-google');
+            
             fetch('/api/verify-google', {
                 method: 'POST',
                 headers: {
@@ -71,31 +99,79 @@
                 },
                 body: JSON.stringify({ token: response.credential })
             })
-            .then(res => res.json())
+            .then(res => {
+                console.log('[index.html] Response status:', res.status);
+                console.log('[index.html] Response statusText:', res.statusText);
+                return res.json();
+            })
             .then(data => {
+                console.log('[index.html] Response data:', JSON.stringify(data, null, 2));
+                
                 if (data.success) {
-                    // Store user info and redirect to home
+                    console.log('[index.html] Authentication successful!');
+                    console.log('[index.html] User email:', data.user.email);
+                    console.log('[index.html] User name:', data.user.name);
+                    
+                    // Store user info and token in sessionStorage
                     sessionStorage.setItem('user', JSON.stringify(data.user));
+                    sessionStorage.setItem('authToken', response.credential);
+                    console.log('[index.html] User data stored in sessionStorage');
+                    
+                    // Redirect to home
+                    console.log('[index.html] Redirecting to /home.html');
                     window.location.href = '/home.html';
                 } else {
+                    console.error('[index.html] Authentication failed:', data.error);
                     alert('Authentication failed: ' + data.error);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred during sign-in');
+                console.error('[index.html] EXCEPTION during sign-in:', error.name);
+                console.error('[index.html] Error message:', error.message);
+                console.error('[index.html] Error stack:', error.stack);
+                alert('An error occurred during sign-in. Check console for details.');
             });
         }
-
+        
+        // Initialize Google Identity Services when library is loaded
         window.onload = function() {
-            google.accounts.id.initialize({
-                client_id: '184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com',
-                callback: handleGoogleSignIn
-            });
-            google.accounts.id.renderButton(
-                document.getElementById('googleSignInButton'),
-                { theme: 'outline', size: 'large', width: '100%' }
-            );
+            console.log('[index.html] window.onload triggered');
+            
+            if (typeof google !== 'undefined' && google.accounts) {
+                console.log('[index.html] Google Identity Services library loaded');
+                
+                try {
+                    // Initialize the button
+                    google.accounts.id.initialize({
+                        client_id: '184950928765-22nhslddgetmmnfl8kl728n6fv0bg7hu.apps.googleusercontent.com',
+                        callback: handleGoogleSignIn
+                    });
+                    console.log('[index.html] Google Sign-In initialized');
+                    
+                    // Render the sign-in button
+                    google.accounts.id.renderButton(
+                        document.getElementById('googleSignInButton'),
+                        { 
+                            theme: 'outline', 
+                            size: 'large',
+                            width: 300,
+                            text: 'signin_with'
+                        }
+                    );
+                    console.log('[index.html] Google Sign-In button rendered');
+                } catch (error) {
+                    console.error('[index.html] Error initializing Google Sign-In:', error.message);
+                    console.error('[index.html] Error stack:', error.stack);
+                }
+            } else {
+                console.error('[index.html] Google Identity Services library not loaded!');
+                setTimeout(function() {
+                    if (typeof google !== 'undefined' && google.accounts) {
+                        console.log('[index.html] Google library loaded after delay, retrying...');
+                        window.onload();
+                    }
+                }, 1000);
+            }
         };
     </script>
 </body>
