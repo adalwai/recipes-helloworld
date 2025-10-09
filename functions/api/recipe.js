@@ -23,39 +23,45 @@ export async function onRequestGet(context) {
   }
 
   try {
-    // Verify authentication
-    const sessionCookie = request.headers.get('Cookie')?.match(/session=([^;]+)/);
-    if (!sessionCookie) {
-      return jsonResponse({ error: 'not authorized' }, 401);
-    }
+    // Fetch recipe from database (matching recipes.js schema)
+    const result = await env.DB.prepare(
+      'SELECT id, title, category, details, created_at FROM recipes WHERE id = ?'
+    )
+    .bind(id)
+    .first();
 
-    const sessionId = sessionCookie[1];
-    const sessionData = await env.RECIPES_KV.get(`session:${sessionId}`, 'json');
-    
-    if (!sessionData || !sessionData.userId) {
-      return jsonResponse({ error: 'not authorized' }, 401);
-    }
-
-    // Fetch recipe from database
-    const recipe = await env.RECIPES_DB.prepare(
-      'SELECT * FROM recipes WHERE id = ? AND user_id = ?'
-    ).bind(id, sessionData.userId).first();
-
-    if (!recipe) {
+    if (!result) {
       return jsonResponse({ error: 'not found' }, 404);
     }
 
-    // Return the recipe
-    return jsonResponse({
-      id: recipe.id,
-      title: recipe.title,
-      ingredients: recipe.ingredients,
-      instructions: recipe.instructions,
-      created_at: recipe.created_at
-    });
+    // Parse details JSON and merge with base fields (same as recipes.js)
+    const details = JSON.parse(result.details);
+    const recipe = {
+      id: result.id,
+      name: result.title,  // Frontend expects 'name'
+      title: result.title,
+      recipeName: result.title,
+      category: result.category,
+      created_at: result.created_at,
+      ...details  // Spread all other fields from details JSON
+    };
+
+    return jsonResponse(recipe);
 
   } catch (error) {
     console.error('Error fetching recipe:', error);
     return jsonResponse({ error: 'internal server error' }, 500);
   }
+}
+
+// Handle OPTIONS for CORS
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    }
+  });
 }
