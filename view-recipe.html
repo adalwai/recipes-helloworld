@@ -43,7 +43,6 @@
   <script>
     document.addEventListener('DOMContentLoaded', initHeaderAuth);
   </script>
-
   <a class="back-link" href="/home">← Back to Home</a>
   <script>
     // Defensive: if user navigated here from within the app, go back; otherwise go to /home
@@ -57,56 +56,58 @@
       });
     }
   </script>
-
   <div class="container">
     <div class="loading" id="loading">Loading recipe...</div>
     <div class="error" id="error" style="display: none;"></div>
     <div id="recipeContent" style="display: none;"></div>
   </div>
-
   <script>
     // Get recipe ID from URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const recipeId = urlParams.get('id');
-
     if (!recipeId) {
       showError('No recipe ID provided in URL.');
     } else {
       fetchRecipeDetails(recipeId);
     }
-
     async function fetchRecipeDetails(id) {
       try {
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
         const recipeContent = document.getElementById('recipeContent');
-
         loading.style.display = 'block';
         error.style.display = 'none';
         recipeContent.style.display = 'none';
-
         const response = await fetch(`/functions/getRecipe?id=${encodeURIComponent(id)}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
-        const recipe = await response.json();
+        
+        // Check Content-Type to determine if response is JSON
+        const contentType = response.headers.get('content-type');
+        let recipe;
+        
+        if (contentType && contentType.includes('application/json')) {
+          recipe = await response.json();
+        } else {
+          // Non-JSON response (e.g., HTML error page)
+          const text = await response.text();
+          const preview = text.substring(0, 200).replace(/<[^>]*>/g, '').trim();
+          throw new Error(`Server returned non-JSON response. Preview: ${preview}...`);
+        }
         
         if (!recipe || !recipe.name) {
           throw new Error('Invalid recipe data received');
         }
-
         displayRecipe(recipe);
         loading.style.display = 'none';
         recipeContent.style.display = 'block';
-
       } catch (err) {
         console.error('Error fetching recipe:', err);
         showError(`Failed to load recipe: ${err.message}`);
       }
     }
-
     function displayRecipe(recipe) {
       const {
         name: recipeName,
@@ -121,7 +122,6 @@
         imageUrl,
         author
       } = recipe;
-
       const recipeHTML = `
         <div class="recipe-header">
           <h1>${escapeHtml(recipeName)}</h1>
@@ -199,7 +199,6 @@
       div.textContent = String(text);
       return div.innerHTML;
     }
-
     function showError(message) {
       const loading = document.getElementById('loading');
       const error = document.getElementById('error');
