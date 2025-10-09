@@ -37,21 +37,18 @@
       .error-message.show { display: block; }
       .success-message { background-color: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
       .success-message.show { display: block; }
+      .user-info { position: absolute; top: 20px; right: 20px; display: flex; align-items: center; gap: 10px; }
+      .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; }
+      .user-name { font-size: 14px; font-weight: normal; }
     </style>
-  </head>
-  <body>
-    <div id="userInfo" style="display:none;">
-      <span id="userName"></span>
-    </div>
-    <script src="/source_code/header.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        initHeaderAuth();
-      });
-    </script>
-    <a class="back-link" href="index.html">← Back to Home</a>
+</head>
+<body>
+    <a class="back-link" href="/home.html">← Back to Home</a>
     <header>
-      <h1>Add Your Recipe</h1>
+      🍳 Add Your Recipe
+      <div class="user-info" id="userInfo">
+        <span class="user-name" id="userName"></span>
+      </div>
     </header>
     <div class="form-container">
       <div class="error-message" id="errorMessage"></div>
@@ -60,7 +57,7 @@
         <!-- Recipe Name -->
         <div class="form-group">
           <label for="recipeName">Recipe Name <span class="required">*</span></label>
-          <input type="text" id="recipeName" name="recipeName" placeholder="e.g., Chocolate Chip Cookies" required>
+          <input type="text" id="recipeName" name="recipeName" required placeholder="e.g., Chocolate Chip Cookies">
         </div>
         <!-- Category -->
         <div class="form-group">
@@ -68,32 +65,40 @@
           <select id="category" name="category" required>
             <option value="">Select a category</option>
             <option value="appetizer">Appetizer</option>
-            <option value="breakfast">Breakfast</option>
-            <option value="lunch">Lunch</option>
-            <option value="dinner">Dinner</option>
+            <option value="main">Main Course</option>
             <option value="dessert">Dessert</option>
-            <option value="snack">Snack</option>
             <option value="beverage">Beverage</option>
-            <option value="soup">Soup</option>
-            <option value="salad">Salad</option>
+            <option value="snack">Snack</option>
           </select>
+        </div>
+        <!-- Ingredients -->
+        <div class="form-group">
+          <label for="ingredients">Ingredients <span class="required">*</span></label>
+          <textarea id="ingredients" name="ingredients" class="ingredients-list" required placeholder="Enter each ingredient on a new line&#10;e.g.,&#10;2 cups flour&#10;1 cup sugar&#10;2 eggs"></textarea>
+          <div class="help-text">Enter one ingredient per line</div>
+        </div>
+        <!-- Instructions -->
+        <div class="form-group">
+          <label for="instructions">Instructions <span class="required">*</span></label>
+          <textarea id="instructions" name="instructions" class="instructions-list" required placeholder="Enter step-by-step instructions&#10;e.g.,&#10;1. Preheat oven to 350°F&#10;2. Mix dry ingredients&#10;3. Add wet ingredients"></textarea>
+          <div class="help-text">Provide clear, step-by-step instructions</div>
+        </div>
+        <!-- Cooking Time -->
+        <div class="form-group">
+          <label>Cooking Time <span class="required">*</span></label>
+          <div class="time-inputs">
+            <input type="number" id="hours" name="hours" min="0" placeholder="Hours" value="0">
+            <span>hours</span>
+            <input type="number" id="minutes" name="minutes" min="0" max="59" placeholder="Minutes" required>
+            <span>minutes</span>
+          </div>
         </div>
         <!-- Servings -->
         <div class="form-group">
-          <label for="servings">Number of Servings <span class="required">*</span></label>
-          <input type="number" id="servings" name="servings" min="1" max="100" placeholder="4" required>
+          <label for="servings">Servings <span class="required">*</span></label>
+          <input type="number" id="servings" name="servings" min="1" required placeholder="e.g., 4">
         </div>
-        <!-- Prep Time -->
-        <div class="form-group">
-          <label for="prepTime">Preparation Time (minutes) <span class="required">*</span></label>
-          <input type="number" id="prepTime" name="prepTime" min="0" placeholder="15" required>
-        </div>
-        <!-- Cook Time -->
-        <div class="form-group">
-          <label for="cookTime">Cooking Time (minutes) <span class="required">*</span></label>
-          <input type="number" id="cookTime" name="cookTime" min="0" placeholder="30" required>
-        </div>
-        <!-- Difficulty Level -->
+        <!-- Difficulty -->
         <div class="form-group">
           <label for="difficulty">Difficulty Level <span class="required">*</span></label>
           <select id="difficulty" name="difficulty" required>
@@ -103,91 +108,34 @@
             <option value="hard">Hard</option>
           </select>
         </div>
-        <!-- Dietary Options -->
-        <div class="form-group">
-          Dietary Options
-          <div class="checkbox-group">
-            <label><input type="checkbox" name="dietary[]" value="vegetarian"> Vegetarian</label>
-            <label><input type="checkbox" name="dietary[]" value="vegan"> Vegan</label>
-            <label><input type="checkbox" name="dietary[]" value="gluten-free"> Gluten-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="dairy-free"> Dairy-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="nut-free"> Nut-Free</label>
-            <label><input type="checkbox" name="dietary[]" value="low-carb"> Low-Carb</label>
-          </div>
-        </div>
-        <!-- Ingredients -->
-        <div class="form-group">
-          <label for="ingredients">Ingredients <span class="required">*</span></label>
-          <textarea id="ingredients" name="ingredients" class="ingredients-list" placeholder="List each ingredient on a new line, e.g.:\n2 cups all-purpose flour\n1 cup sugar\n1/2 cup butter" required></textarea>
-          <p class="help-text">Enter one ingredient per line with quantity and measurement</p>
-        </div>
-        <!-- Instructions -->
-        <div class="form-group">
-          <label for="instructions">Cooking Instructions <span class="required">*</span></label>
-          <textarea id="instructions" name="instructions" class="instructions-list" placeholder="List each step on a new line, e.g.:\n1. Preheat oven to 350°F\n2. Mix dry ingredients in a bowl\n3. Add wet ingredients and stir" required></textarea>
-          <p class="help-text">Enter one step per line, numbered if desired</p>
-        </div>
-        <!-- Description -->
-        <div class="form-group">
-          <label for="description">Recipe Description</label>
-          <textarea id="description" name="description" placeholder="Add a brief description of your recipe, what makes it special, or any tips..."></textarea>
-        </div>
         <!-- Image URL -->
         <div class="form-group">
           <label for="imageUrl">Recipe Image URL</label>
           <input type="url" id="imageUrl" name="imageUrl" placeholder="https://example.com/recipe-image.jpg">
-          <p class="help-text">Optional: Add a link to an image of your recipe</p>
+          <div class="help-text">Optional: Paste a URL to an image of your recipe</div>
         </div>
-        <!-- Author Name -->
+        <!-- Dietary Options -->
         <div class="form-group">
-          <label for="authorName">Your Name</label>
-          <input type="text" id="authorName" name="authorName" placeholder="Your name (optional)">
+          <label>Dietary Preferences</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" name="vegetarian" value="vegetarian"> Vegetarian</label>
+            <label><input type="checkbox" name="vegan" value="vegan"> Vegan</label>
+            <label><input type="checkbox" name="glutenFree" value="glutenFree"> Gluten-Free</label>
+            <label><input type="checkbox" name="dairyFree" value="dairyFree"> Dairy-Free</label>
+          </div>
         </div>
-        <!-- Button Group -->
+        <!-- Buttons -->
         <div class="button-group">
-          <button type="submit" class="submit-btn">Submit Recipe</button>
+          <button type="submit" class="submit-btn">Add Recipe</button>
           <button type="reset" class="reset-btn">Clear Form</button>
         </div>
       </form>
     </div>
+    <!-- Unified header auth script -->
+    <script src="/source_code/header.js"></script>
     <script>
-      // Existing form submission handler
-      document.getElementById('recipeForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const errorDiv = document.getElementById('errorMessage');
-        const successDiv = document.getElementById('successMessage');
-        errorDiv.classList.remove('show');
-        successDiv.classList.remove('show');
-        const submitBtn = this.querySelector('.submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-        try {
-          const formData = new FormData(this);
-          const recipeData = {};
-          for (let [key, value] of formData.entries()) {
-            if (key.includes('[]')) {
-              const cleanKey = key.replace('[]', '');
-              if (!recipeData[cleanKey]) recipeData[cleanKey] = [];
-              recipeData[cleanKey].push(value);
-            } else {
-              recipeData[key] = value;
-            }
-          }
-          if (recipeData.recipeName) { recipeData.title = recipeData.recipeName; }
-          const response = await fetch('/api/recipes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(recipeData) });
-          let result; try { result = await response.json(); } catch { result = { error: 'Invalid response from server' }; }
-          if (!response.ok) { const errorMessage = result.error || result.message || 'Failed to save recipe'; throw new Error(`HTTP ${response.status}: ${errorMessage}`); }
-          successDiv.textContent = 'Recipe saved successfully! Redirecting...';
-          successDiv.classList.add('show');
-          setTimeout(() => { window.location.href = '/index.html'; }, 1500);
-        } catch (error) {
-          console.error('Error submitting recipe:', error);
-          errorDiv.textContent = 'Error submitting recipe: ' + error.message;
-          errorDiv.classList.add('show');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit Recipe';
-        }
-      });
+      document.addEventListener('DOMContentLoaded', initHeaderAuth);
     </script>
-  </body>
+    <script src="/source_code/addRecipe.js"></script>
+</body>
 </html>
