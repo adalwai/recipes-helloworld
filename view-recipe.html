@@ -1,9 +1,154 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Recipe - Family Recipe Collection</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .back-link {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      border: 2px solid white;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    .back-link:hover {
+      background: white;
+      color: #667eea;
+    }
+    .content {
+      padding: 2rem;
+    }
+    #loading {
+      text-align: center;
+      padding: 2rem;
+      color: #667eea;
+      font-size: 1.2rem;
+    }
+    #error {
+      display: none;
+      background: #fee;
+      border: 1px solid #fcc;
+      color: #c33;
+      padding: 1rem;
+      border-radius: 5px;
+      margin: 1rem 0;
+    }
+    #recipeContent {
+      display: none;
+    }
+    .recipe-header {
+      margin-bottom: 2rem;
+    }
+    .recipe-title {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 1rem;
+    }
+    .recipe-meta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .info-card {
+      flex: 1;
+      min-width: 150px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+    .info-card strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+    .info-card span {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .recipe-section {
+      margin-bottom: 2rem;
+    }
+    .recipe-section h2 {
+      color: #667eea;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 0.5rem;
+    }
+    .ingredients-list, .instructions-list {
+      padding-left: 1.5rem;
+    }
+    .ingredients-list li, .instructions-list li {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+      color: #555;
+    }
+    .author-info {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 5px;
+      color: #666;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🍳 Family Recipe Collection</h1>
+      <p>View Recipe Details</p>
+      <a href="/home" class="back-link">← Back to Home</a>
+    </div>
+    <div class="content">
+      <div id="loading">Loading recipe...</div>
+      <div id="error"></div>
+      <div id="recipeContent"></div>
+    </div>
+  </div>
 
-<!-- ... existing HTML omitted for brevity ... -->
 <script>
+  // Initialize header auth
   document.addEventListener('DOMContentLoaded', initHeaderAuth);
-
+  
   // Back link behavior preserved
   const link = document.querySelector('a[href="/home"]');
   if (link) {
@@ -14,31 +159,31 @@
       }
     });
   }
-
+  
   // Get recipe ID from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
   const recipeId = urlParams.get('id');
+  
   if (!recipeId) {
     showError('No recipe ID provided in URL.');
   } else {
     fetchRecipeDetails(recipeId);
   }
-
+  
   async function fetchRecipeDetails(id) {
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const recipeContent = document.getElementById('recipeContent');
-
+    
     try {
       loading.style.display = 'block';
       error.style.display = 'none';
       recipeContent.style.display = 'none';
-
+      
       const response = await fetch(`/api/recipe?id=${encodeURIComponent(id)}`);
-
+      
       // If HTTP not ok, attempt to read JSON error safely only if JSON; otherwise show friendly message
       const contentType = response.headers.get('content-type') || '';
-
       if (!response.ok) {
         if (contentType.includes('application/json')) {
           // Try to parse structured error payload
@@ -50,69 +195,72 @@
           throw new Error(`Request failed with status ${response.status}. Please try again later.`);
         }
       }
-
+      
       // Only parse JSON if content-type is application/json
       if (!contentType.includes('application/json')) {
         // Avoid parsing HTML; show friendly preview-free message
         throw new Error('Unexpected server response format. Please try again later.');
       }
-
+      
       const data = await response.json();
-
+      
       // If backend returns JSON error in a 200, handle it
       if (data && (data.error || data.message) && !data.name) {
         const msg = data.message || data.error || 'An unknown error occurred.';
         throw new Error(msg);
       }
-
+      
+      // Data should have recipe fields
       if (!data || !data.name) {
-        throw new Error('Invalid recipe data received.');
+        throw new Error('Recipe not found or invalid data received.');
       }
-
+      
       displayRecipe(data);
+      
       loading.style.display = 'none';
+      error.style.display = 'none';
       recipeContent.style.display = 'block';
     } catch (err) {
       console.error('Error fetching recipe:', err);
-      showError(`Failed to load recipe: ${err.message}`);
+      showError(err.message || 'Failed to load recipe. Please try again.');
     }
   }
-
+  
+  // Helper function to ensure ingredients and instructions are always arrays
+  function safeArray(val) {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string') return val.split('\n').map(line => line.trim()).filter(Boolean);
+    return [];
+  }
+  
   function displayRecipe(recipe) {
     const {
       name: recipeName,
-      category,
-      difficulty,
-      servings,
+      description,
       prepTime,
       cookTime,
       totalTime,
-      ingredients = [],
-      instructions = [],
-      imageUrl,
       author
     } = recipe;
-
+    
+    // Use safeArray to ensure ingredients and instructions are always arrays
+    const ingredients = safeArray(recipe.ingredients);
+    const instructions = safeArray(recipe.instructions);
+    
+    // Validate that we have at least a name
+    if (!recipeName) {
+      showError('Recipe name is missing.');
+      return;
+    }
+    
     const recipeHTML = `
       <div class="recipe-header">
-        <h1>${escapeHtml(recipeName)}</h1>
-        <div class="recipe-meta">
-          ${category ? `<span class="badge badge-category">${escapeHtml(category)}</span>` : ''}
-          ${difficulty ? `<span class="badge badge-difficulty">${escapeHtml(difficulty)}</span>` : ''}
-        </div>
+        <h1 class="recipe-title">${escapeHtml(recipeName)}</h1>
+        ${description ? `<p style="color: #666; line-height: 1.6;">${escapeHtml(description)}</p>` : ''}
       </div>
-
-      ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(recipeName)}" class="recipe-image">` : ''}
-
-      <div class="recipe-content">
-        ${(servings || prepTime || cookTime || totalTime) ? `
-          <div class="info-grid">
-          ${servings ? `
-            <div class="info-card">
-              <strong>Servings</strong>
-              <span>${escapeHtml(String(servings))}</span>
-            </div>
-          ` : ''}
+      
+      ${prepTime || cookTime || totalTime ? `
+        <div class="recipe-meta">
           ${prepTime ? `
             <div class="info-card">
               <strong>Prep Time</strong>
@@ -131,54 +279,55 @@
               <span>${escapeHtml(String(totalTime))} min</span>
             </div>
           ` : ''}
-          </div>
-        ` : ''}
-
-        ${ingredients.length > 0 ? `
-          <div class="recipe-section">
-            <h2>Ingredients</h2>
-            <ul class="ingredients-list">
-              ${ingredients.map(ingredient => `<li>${escapeHtml(ingredient)}</li>`).join('')}
-            </ul>
-          </div>
-        ` : '<div class="recipe-section"><h2>Ingredients</h2><p>No ingredients listed.</p></div>'}
-
-        ${instructions.length > 0 ? `
-          <div class="recipe-section">
-            <h2>Instructions</h2>
-            <ol class="instructions-list">
-              ${instructions.map(instruction => `<li>${escapeHtml(instruction)}</li>`).join('')}
-            </ol>
-          </div>
-        ` : '<div class="recipe-section"><h2>Instructions</h2><p>No instructions provided.</p></div>'}
-
-        ${author ? `
-          <div class="author-info">
-            <strong>Recipe by:</strong> ${escapeHtml(author)}
-          </div>
-        ` : ''}
-      </div>
+        </div>
+      ` : ''}
+      
+      ${ingredients.length > 0 ? `
+        <div class="recipe-section">
+          <h2>Ingredients</h2>
+          <ul class="ingredients-list">
+            ${ingredients.map(ingredient => `<li>${escapeHtml(ingredient)}</li>`).join('')}
+          </ul>
+        </div>
+      ` : '<div class="recipe-section"><h2>Ingredients</h2><p>No ingredients listed.</p></div>'}
+      
+      ${instructions.length > 0 ? `
+        <div class="recipe-section">
+          <h2>Instructions</h2>
+          <ol class="instructions-list">
+            ${instructions.map(instruction => `<li>${escapeHtml(instruction)}</li>`).join('')}
+          </ol>
+        </div>
+      ` : '<div class="recipe-section"><h2>Instructions</h2><p>No instructions provided.</p></div>'}
+      
+      ${author ? `
+        <div class="author-info">
+          Recipe by: ${escapeHtml(author)}
+        </div>
+      ` : ''}
     `;
-
+    
     document.getElementById('recipeContent').innerHTML = recipeHTML;
     document.title = `${recipeName} - Family Recipe Collection`;
   }
-
+  
   function escapeHtml(text) {
     if (!text) return '';
     const div = document.createElement('div');
     div.textContent = String(text);
     return div.innerHTML;
   }
-
+  
   function showError(message) {
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const recipeContent = document.getElementById('recipeContent');
-
+    
     loading.style.display = 'none';
     error.textContent = message;
     error.style.display = 'block';
     recipeContent.style.display = 'none';
   }
 </script>
+</body>
+</html>
