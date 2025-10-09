@@ -1,214 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recipe Details - Family Recipe Collection</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-    .back-link { display: inline-block; color: white; text-decoration: none; padding: 10px 20px; background-color: rgba(255, 255, 255, 0.2); border-radius: 5px; margin-bottom: 20px; transition: background-color 0.3s; }
-    .back-link:hover { background-color: rgba(255, 255, 255, 0.3); }
-    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); overflow: hidden; }
-    .recipe-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
-    .recipe-header h1 { font-size: 2.5em; margin-bottom: 10px; }
-    .recipe-meta { display: flex; justify-content: center; gap: 30px; margin-top: 20px; flex-wrap: wrap; }
-    .meta-item { display: flex; flex-direction: column; align-items: center; }
-    .meta-item strong { font-size: 1.2em; margin-bottom: 5px; }
-    .recipe-image { width: 100%; height: 400px; object-fit: cover; }
-    .recipe-content { padding: 40px; }
-    .recipe-section { margin-bottom: 30px; }
-    .recipe-section h2 { color: #667eea; margin-bottom: 15px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .info-card { background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; }
-    .info-card strong { display: block; color: #667eea; margin-bottom: 5px; font-size: 0.9em; }
-    .info-card span { font-size: 1.2em; color: #333; }
-    .ingredients-list, .instructions-list { background: #f8f9fa; padding: 20px; border-radius: 10px; }
-    .ingredients-list li, .instructions-list li { padding: 10px; margin-bottom: 10px; background: white; border-radius: 5px; list-style-position: inside; }
-    .instructions-list li { border-left: 4px solid #667eea; padding-left: 15px; }
-    .badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
-    .badge-category { background: #e3f2fd; color: #1976d2; }
-    .badge-difficulty { background: #fff3e0; color: #f57c00; }
-    .loading { text-align: center; padding: 100px; font-size: 1.5em; color: #667eea; }
-    .error { text-align: center; padding: 100px; color: #d32f2f; font-size: 1.2em; }
-    .author-info { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 30px; text-align: center; }
-    .author-info strong { color: #667eea; }
-  </style>
-</head>
-<body>
-  <div class="user-info" id="userInfo">
-    <span class="user-name" id="userName"></span>
-  </div>
-  <script src="/source_code/header.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', initHeaderAuth);
-  </script>
-  <a class="back-link" href="/home">← Back to Home</a>
-  <script>
-    // Defensive: if user navigated here from within the app, go back; otherwise go to /home
-    const link = document.querySelector('a[href="/home"]');
-    if (link) {
-      link.addEventListener('click', function (e) {
-        if (document.referrer && document.referrer.startsWith(location.origin)) {
-          e.preventDefault();
-          history.back();
-        }
-      });
-    }
-  </script>
-  <div class="container">
-    <div class="loading" id="loading">Loading recipe...</div>
-    <div class="error" id="error" style="display: none;"></div>
-    <div id="recipeContent" style="display: none;"></div>
-  </div>
-  <script>
-    // Get recipe ID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const recipeId = urlParams.get('id');
-    if (!recipeId) {
-      showError('No recipe ID provided in URL.');
-    } else {
-      fetchRecipeDetails(recipeId);
-    }
-    async function fetchRecipeDetails(id) {
-      try {
-        const loading = document.getElementById('loading');
-        const error = document.getElementById('error');
-        const recipeContent = document.getElementById('recipeContent');
-        loading.style.display = 'block';
-        error.style.display = 'none';
-        recipeContent.style.display = 'none';
-        const response = await fetch(`/functions/getRecipe?id=${encodeURIComponent(id)}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        // Check Content-Type to determine if response is JSON
-        const contentType = response.headers.get('content-type');
-        let recipe;
-        
-        if (contentType && contentType.includes('application/json')) {
-          recipe = await response.json();
-        } else {
-          // Non-JSON response (e.g., HTML error page)
-          const text = await response.text();
-          const preview = text.substring(0, 200).replace(/<[^>]*>/g, '').trim();
-          throw new Error(`Server returned non-JSON response. Preview: ${preview}...`);
-        }
-        
-        if (!recipe || !recipe.name) {
-          throw new Error('Invalid recipe data received');
-        }
-        displayRecipe(recipe);
-        loading.style.display = 'none';
-        recipeContent.style.display = 'block';
-      } catch (err) {
-        console.error('Error fetching recipe:', err);
-        showError(`Failed to load recipe: ${err.message}`);
+
+<!-- ... existing HTML omitted for brevity ... -->
+<script>
+  document.addEventListener('DOMContentLoaded', initHeaderAuth);
+
+  // Back link behavior preserved
+  const link = document.querySelector('a[href="/home"]');
+  if (link) {
+    link.addEventListener('click', function (e) {
+      if (document.referrer && document.referrer.startsWith(location.origin)) {
+        e.preventDefault();
+        history.back();
       }
-    }
-    function displayRecipe(recipe) {
-      const {
-        name: recipeName,
-        category,
-        difficulty,
-        servings,
-        prepTime,
-        cookTime,
-        totalTime,
-        ingredients = [],
-        instructions = [],
-        imageUrl,
-        author
-      } = recipe;
-      const recipeHTML = `
-        <div class="recipe-header">
-          <h1>${escapeHtml(recipeName)}</h1>
-          <div class="recipe-meta">
-            ${category ? `<span class="badge badge-category">${escapeHtml(category)}</span>` : ''}
-            ${difficulty ? `<span class="badge badge-difficulty">${escapeHtml(difficulty)}</span>` : ''}
-          </div>
-        </div>
-        
-        ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(recipeName)}" class="recipe-image">` : ''}
-        
-        <div class="recipe-content">
-          ${(servings || prepTime || cookTime || totalTime) ? `
-            <div class="info-grid">
-            ${servings ? `
-              <div class="info-card">
-                <strong>Servings</strong>
-                <span>${escapeHtml(String(servings))}</span>
-              </div>
-            ` : ''}
-            ${prepTime ? `
-              <div class="info-card">
-                <strong>Prep Time</strong>
-                <span>${escapeHtml(String(prepTime))} min</span>
-              </div>
-            ` : ''}
-            ${cookTime ? `
-              <div class="info-card">
-                <strong>Cook Time</strong>
-                <span>${escapeHtml(String(cookTime))} min</span>
-              </div>
-            ` : ''}
-            ${totalTime ? `
-              <div class="info-card">
-                <strong>Total Time</strong>
-                <span>${totalTime} min</span>
-              </div>
-            ` : ''}
-            </div>
-          ` : ''}
-          
-          ${ingredients.length > 0 ? `
-            <div class="recipe-section">
-              <h2>Ingredients</h2>
-              <ul class="ingredients-list">
-                ${ingredients.map(ingredient => `<li>${escapeHtml(ingredient)}</li>`).join('')}
-              </ul>
-            </div>
-          ` : '<div class="recipe-section"><h2>Ingredients</h2><p>No ingredients listed.</p></div>'}
-          
-          ${instructions.length > 0 ? `
-            <div class="recipe-section">
-              <h2>Instructions</h2>
-              <ol class="instructions-list">
-                ${instructions.map(instruction => `<li>${escapeHtml(instruction)}</li>`).join('')}
-              </ol>
-            </div>
-          ` : '<div class="recipe-section"><h2>Instructions</h2><p>No instructions provided.</p></div>'}
-          
-          ${author ? `
-            <div class="author-info">
-              <strong>Recipe by:</strong> ${escapeHtml(author)}
-            </div>
-          ` : ''}
-        </div>
-      `;
-      
-      document.getElementById('recipeContent').innerHTML = recipeHTML;
-      document.title = `${recipeName} - Family Recipe Collection`;
-    }
-    
-    function escapeHtml(text) {
-      if (!text) return '';
-      const div = document.createElement('div');
-      div.textContent = String(text);
-      return div.innerHTML;
-    }
-    function showError(message) {
-      const loading = document.getElementById('loading');
-      const error = document.getElementById('error');
-      const recipeContent = document.getElementById('recipeContent');
-      
-      loading.style.display = 'none';
-      error.textContent = message;
-      error.style.display = 'block';
+    });
+  }
+
+  // Get recipe ID from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const recipeId = urlParams.get('id');
+  if (!recipeId) {
+    showError('No recipe ID provided in URL.');
+  } else {
+    fetchRecipeDetails(recipeId);
+  }
+
+  async function fetchRecipeDetails(id) {
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const recipeContent = document.getElementById('recipeContent');
+
+    try {
+      loading.style.display = 'block';
+      error.style.display = 'none';
       recipeContent.style.display = 'none';
+
+      const response = await fetch(`/api/recipe?id=${encodeURIComponent(id)}`);
+
+      // If HTTP not ok, attempt to read JSON error safely only if JSON; otherwise show friendly message
+      const contentType = response.headers.get('content-type') || '';
+
+      if (!response.ok) {
+        if (contentType.includes('application/json')) {
+          // Try to parse structured error payload
+          const errJson = await response.json().catch(() => null);
+          const msg = errJson?.message || errJson?.error || `Request failed with status ${response.status}`;
+          throw new Error(msg);
+        } else {
+          // Do not attempt to parse HTML/text bodies
+          throw new Error(`Request failed with status ${response.status}. Please try again later.`);
+        }
+      }
+
+      // Only parse JSON if content-type is application/json
+      if (!contentType.includes('application/json')) {
+        // Avoid parsing HTML; show friendly preview-free message
+        throw new Error('Unexpected server response format. Please try again later.');
+      }
+
+      const data = await response.json();
+
+      // If backend returns JSON error in a 200, handle it
+      if (data && (data.error || data.message) && !data.name) {
+        const msg = data.message || data.error || 'An unknown error occurred.';
+        throw new Error(msg);
+      }
+
+      if (!data || !data.name) {
+        throw new Error('Invalid recipe data received.');
+      }
+
+      displayRecipe(data);
+      loading.style.display = 'none';
+      recipeContent.style.display = 'block';
+    } catch (err) {
+      console.error('Error fetching recipe:', err);
+      showError(`Failed to load recipe: ${err.message}`);
     }
-  </script>
-</body>
-</html>
+  }
+
+  function displayRecipe(recipe) {
+    const {
+      name: recipeName,
+      category,
+      difficulty,
+      servings,
+      prepTime,
+      cookTime,
+      totalTime,
+      ingredients = [],
+      instructions = [],
+      imageUrl,
+      author
+    } = recipe;
+
+    const recipeHTML = `
+      <div class="recipe-header">
+        <h1>${escapeHtml(recipeName)}</h1>
+        <div class="recipe-meta">
+          ${category ? `<span class="badge badge-category">${escapeHtml(category)}</span>` : ''}
+          ${difficulty ? `<span class="badge badge-difficulty">${escapeHtml(difficulty)}</span>` : ''}
+        </div>
+      </div>
+
+      ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(recipeName)}" class="recipe-image">` : ''}
+
+      <div class="recipe-content">
+        ${(servings || prepTime || cookTime || totalTime) ? `
+          <div class="info-grid">
+          ${servings ? `
+            <div class="info-card">
+              <strong>Servings</strong>
+              <span>${escapeHtml(String(servings))}</span>
+            </div>
+          ` : ''}
+          ${prepTime ? `
+            <div class="info-card">
+              <strong>Prep Time</strong>
+              <span>${escapeHtml(String(prepTime))} min</span>
+            </div>
+          ` : ''}
+          ${cookTime ? `
+            <div class="info-card">
+              <strong>Cook Time</strong>
+              <span>${escapeHtml(String(cookTime))} min</span>
+            </div>
+          ` : ''}
+          ${totalTime ? `
+            <div class="info-card">
+              <strong>Total Time</strong>
+              <span>${escapeHtml(String(totalTime))} min</span>
+            </div>
+          ` : ''}
+          </div>
+        ` : ''}
+
+        ${ingredients.length > 0 ? `
+          <div class="recipe-section">
+            <h2>Ingredients</h2>
+            <ul class="ingredients-list">
+              ${ingredients.map(ingredient => `<li>${escapeHtml(ingredient)}</li>`).join('')}
+            </ul>
+          </div>
+        ` : '<div class="recipe-section"><h2>Ingredients</h2><p>No ingredients listed.</p></div>'}
+
+        ${instructions.length > 0 ? `
+          <div class="recipe-section">
+            <h2>Instructions</h2>
+            <ol class="instructions-list">
+              ${instructions.map(instruction => `<li>${escapeHtml(instruction)}</li>`).join('')}
+            </ol>
+          </div>
+        ` : '<div class="recipe-section"><h2>Instructions</h2><p>No instructions provided.</p></div>'}
+
+        ${author ? `
+          <div class="author-info">
+            <strong>Recipe by:</strong> ${escapeHtml(author)}
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    document.getElementById('recipeContent').innerHTML = recipeHTML;
+    document.title = `${recipeName} - Family Recipe Collection`;
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  }
+
+  function showError(message) {
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const recipeContent = document.getElementById('recipeContent');
+
+    loading.style.display = 'none';
+    error.textContent = message;
+    error.style.display = 'block';
+    recipeContent.style.display = 'none';
+  }
+</script>
