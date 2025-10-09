@@ -1,10 +1,21 @@
 // /api/recipe - Get a single recipe by ID
 // Always returns valid JSON (never HTML)
-
 export async function onRequestGet(context) {
   const { request, env } = context;
   const url = new URL(request.url);
   const id = url.searchParams.get('id');
+
+  // Helper to convert snake_case to camelCase
+  const toCamelCase = (obj) => {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(toCamelCase);
+    
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      acc[camelKey] = toCamelCase(obj[key]);
+      return acc;
+    }, {});
+  };
 
   // Helper to return JSON response
   const jsonResponse = (data, status = 200) => {
@@ -36,18 +47,21 @@ export async function onRequestGet(context) {
 
     // Parse details JSON and merge with base fields (same as recipes.js)
     const details = JSON.parse(result.details);
+    
+    // Convert all snake_case fields to camelCase
+    const camelDetails = toCamelCase(details);
+    
     const recipe = {
       id: result.id,
       name: result.title,  // Frontend expects 'name'
       title: result.title,
       recipeName: result.title,
       category: result.category,
-      created_at: result.created_at,
-      ...details  // Spread all other fields from details JSON
+      createdAt: result.created_at,  // Convert to camelCase
+      ...camelDetails  // Spread all other fields from details JSON (now in camelCase)
     };
 
     return jsonResponse(recipe);
-
   } catch (error) {
     console.error('Error fetching recipe:', error);
     return jsonResponse({ error: 'internal server error' }, 500);
